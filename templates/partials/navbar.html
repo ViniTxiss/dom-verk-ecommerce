@@ -60,6 +60,13 @@
 
       <!-- Conta -->
       {% if user.is_authenticated %}
+      {% if user.is_staff %}
+      <a href="{% url 'dashboard:home' %}" class="nav-action" aria-label="Painel Admin" title="Painel Admin" style="color: var(--color-accent, #c8a96e);">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </a>
+      {% endif %}
       <a href="{% url 'accounts:profile' %}" class="nav-action" aria-label="Minha Conta">
         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>

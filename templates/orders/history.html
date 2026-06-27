@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meus Pedidos — DOM VERK{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1rem; max-width: 900px; margin: 0 auto;">
+
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">Meus Pedidos</h1>
+    <p style="color: var(--color-muted, #888);">Histórico de todas as suas compras na DOM VERK.</p>
+  </div>
+
+  {% if orders %}
+    {% for order in orders %}
+    <div style="
+      background: var(--color-surface, #111);
+      border: 1px solid var(--color-border, #222);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    ">
+      <!-- Cabeçalho do Pedido -->
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--color-border, #222);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      ">
+        <div>
+          <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Pedido</div>
+          <div style="font-size: 1.1rem; font-weight: 700; color: var(--color-accent, #c8a96e);">{{ order.order_number }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px;">Data</div>
+          <div style="font-size: 0.9rem;">{{ order.created_at|date:"d/m/Y" }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px;">Pagamento</div>
+          <div style="font-size: 0.9rem;">{{ order.get_payment_method_display }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px;">Total</div>
+          <div style="font-size: 1.1rem; font-weight: 700;">R$ {{ order.total|floatformat:2 }}</div>
+        </div>
+        <div>
+          {% if order.status == 'pending' %}
+            <span style="background:rgba(245,158,11,0.15); color:#f59e0b; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;">Aguardando Pagamento</span>
+          {% elif order.status == 'paid' %}
+            <span style="background:rgba(34,197,94,0.15); color:#22c55e; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;">Pago</span>
+          {% elif order.status == 'processing' %}
+            <span style="background:rgba(59,130,246,0.15); color:#3b82f6; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;">Em Processamento</span>
+          {% elif order.status == 'shipped' %}
+            <span style="background:rgba(139,92,246,0.15); color:#a78bfa; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;">Enviado</span>
+          {% elif order.status == 'delivered' %}
+            <span style="background:rgba(34,197,94,0.2); color:#22c55e; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;">✓ Entregue</span>
+          {% elif order.status == 'cancelled' %}
+            <span style="background:rgba(239,68,68,0.15); color:#ef4444; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;">Cancelado</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Itens -->
+      <div style="padding: 1.25rem 1.5rem;">
+        {% for item in order.items.all %}
+        <div style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          gap: 1rem;
+          flex-wrap: wrap;
+        ">
+          <div style="flex: 1; min-width: 200px;">
+            <div style="font-weight: 600; margin-bottom: 3px;">{{ item.product_name }}</div>
+            <div style="font-size: 0.8rem; color: #888;">{{ item.product_color|capfirst }} · Tamanho {{ item.product_size }} · Qtd: {{ item.quantity }}</div>
+          </div>
+          <div style="font-weight: 600; white-space: nowrap;">R$ {{ item.total_price|floatformat:2 }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Resumo de valores -->
+      <div style="
+        padding: 1rem 1.5rem;
+        background: rgba(255,255,255,0.02);
+        display: flex;
+        justify-content: flex-end;
+        gap: 2rem;
+        font-size: 0.85rem;
+        color: #888;
+        flex-wrap: wrap;
+      ">
+        <span>Subtotal: R$ {{ order.subtotal|floatformat:2 }}</span>
+        <span>Frete: R$ {{ order.shipping|floatformat:2 }}</span>
+        {% if order.discount %}<span style="color: #22c55e;">Desconto: -R$ {{ order.discount|floatformat:2 }}</span>{% endif %}
+        <strong style="color: var(--color-text, #fff);">Total: R$ {{ order.total|floatformat:2 }}</strong>
+      </div>
+    </div>
+    {% endfor %}
+
+  {% else %}
+    <div style="text-align: center; padding: 5rem 2rem;">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">🛍️</div>
+      <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 0.75rem;">Nenhum pedido ainda</h2>
+      <p style="color: #888; margin-bottom: 2rem;">Suas compras aparecerão aqui após a finalização.</p>
+      <a href="{% url 'products:list' %}" class="btn btn--accent">Ir às Compras</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
