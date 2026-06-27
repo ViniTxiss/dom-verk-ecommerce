@@ -1,0 +1,174 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}{{ action }} Produto — DOM VERK{% endblock %}
+{% block breadcrumb %}Produtos › {{ action }}{% endblock %}
+{% block nav_products %}active{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{% url 'dashboard:products' %}" class="btn btn--ghost btn--sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">{{ action }} Produto</h1>
+    <p class="page-header__sub">
+      {% if product %}Editando: <strong>{{ product.name }}</strong>{% else %}Preencha as informações do novo produto.{% endif %}
+    </p>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <div style="display:grid; grid-template-columns: 1fr 320px; gap:20px; align-items:start;">
+
+    <!-- COLUNA ESQUERDA -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <!-- INFORMAÇÕES BÁSICAS -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Informações Básicas</span></div>
+        <div class="card__body">
+          <div class="form-grid">
+
+            <div class="form-group form-group--full">
+              <label for="name">Nome do Produto *</label>
+              <input type="text" id="name" name="name" required
+                     value="{{ product.name|default:'' }}"
+                     placeholder="Ex: Camiseta DOM VERK Essential">
+            </div>
+
+            <div class="form-group">
+              <label for="category">Categoria</label>
+              <select id="category" name="category">
+                <option value="">Sem categoria</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                  {% if product.category_id == cat.id %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="price">Preço (R$) *</label>
+              <input type="number" id="price" name="price" required step="0.01" min="0"
+                     value="{{ product.price|default:'' }}"
+                     placeholder="89.90">
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="price_promo">Preço Promocional (R$)</label>
+              <input type="number" id="price_promo" name="price_promo" step="0.01" min="0"
+                     value="{{ product.price_promo|default:'' }}"
+                     placeholder="Deixe vazio se não houver promoção">
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="description">Descrição</label>
+              <textarea id="description" name="description"
+                        placeholder="Descrição curta do produto...">{{ product.description|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="story">História do Produto <span style="color:var(--muted); font-weight:400">(copy cultural)</span></label>
+              <textarea id="story" name="story" style="min-height:130px;"
+                        placeholder="Conte a história da peça — inspirações, processo, identidade...">{{ product.story|default:'' }}</textarea>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- IMAGENS -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Imagens</span></div>
+        <div class="card__body">
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="image">Imagem Principal</label>
+              {% if product.image %}
+              <div style="margin-bottom:8px;">
+                <img src="{{ product.image.url }}" alt="" style="height:80px; border-radius:6px; border:1px solid var(--border);">
+              </div>
+              {% endif %}
+              <input type="file" id="image" name="image" accept="image/*">
+              {% if product.image %}<small style="color:var(--muted); font-size:11px;">Deixe vazio para manter a atual</small>{% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="image_hover">Imagem Hover (opcional)</label>
+              {% if product.image_hover %}
+              <div style="margin-bottom:8px;">
+                <img src="{{ product.image_hover.url }}" alt="" style="height:80px; border-radius:6px; border:1px solid var(--border);">
+              </div>
+              {% endif %}
+              <input type="file" id="image_hover" name="image_hover" accept="image/*">
+              {% if product.image_hover %}<small style="color:var(--muted); font-size:11px;">Deixe vazio para manter a atual</small>{% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <!-- FLAGS -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Configurações</span></div>
+        <div class="card__body" style="display:flex; flex-direction:column; gap:0;">
+          <div class="checkbox-row">
+            <input type="checkbox" id="is_active" name="is_active"
+                   {% if product.is_active or not product %}checked{% endif %}>
+            <label for="is_active">Produto Ativo</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="is_featured" name="is_featured"
+                   {% if product.is_featured %}checked{% endif %}>
+            <label for="is_featured">⭐ Produto em Destaque</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="is_flash_deal" name="is_flash_deal"
+                   {% if product.is_flash_deal %}checked{% endif %}>
+            <label for="is_flash_deal">⚡ Flash Deal</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <button type="submit" class="btn btn--primary" style="width:100%; padding:12px;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        {% if product %}Salvar Alterações{% else %}Criar Produto{% endif %}
+      </button>
+
+      {% if product %}
+      <div style="text-align:center;">
+        <a href="{{ product.get_absolute_url|default:'#' }}" target="_blank"
+           class="btn btn--ghost btn--sm" style="width:100%;">
+          Ver na loja →
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- INFO: variantes via admin -->
+      {% if product %}
+      <div style="background:rgba(200,169,110,0.05); border:1px solid rgba(200,169,110,0.15); border-radius:10px; padding:16px; font-size:12px; color:var(--muted);">
+        <strong style="color:var(--accent); display:block; margin-bottom:6px;">Variantes e Galeria</strong>
+        Para gerenciar tamanhos, cores e fotos adicionais, use o
+        <a href="/admin/products/product/{{ product.id }}/change/" target="_blank"
+           style="color:var(--accent); text-decoration:none;">Django Admin →</a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</form>
+
+{% endblock %}

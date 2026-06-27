@@ -1,0 +1,149 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Pedido {{ order.order_number }} — DOM VERK{% endblock %}
+{% block breadcrumb %}Pedidos › {{ order.order_number }}{% endblock %}
+{% block nav_orders %}active{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{% url 'dashboard:orders' %}" class="btn btn--ghost btn--sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+
+<div style="display:grid; grid-template-columns: 1fr 340px; gap:20px; align-items:start;">
+
+  <!-- COLUNA ESQUERDA -->
+  <div style="display:flex; flex-direction:column; gap:20px;">
+
+    <!-- ITENS DO PEDIDO -->
+    <div class="card">
+      <div class="card__header">
+        <span class="card__title">Itens do Pedido</span>
+        <span class="badge badge--{{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Cor / Tamanho</th>
+              <th>Qtd</th>
+              <th>Unitário</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+            <tr>
+              <td><strong>{{ item.product_name }}</strong></td>
+              <td style="color:var(--muted)">{{ item.product_color }} / {{ item.product_size }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>R$ {{ item.price }}</td>
+              <td><strong>R$ {{ item.total_price }}</strong></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:16px 24px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
+          <span>Subtotal</span><span>R$ {{ order.subtotal }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
+          <span>Frete</span><span>R$ {{ order.shipping }}</span>
+        </div>
+        {% if order.discount %}
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--success)">
+          <span>Desconto</span><span>-R$ {{ order.discount }}</span>
+        </div>
+        {% endif %}
+        <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; padding-top:8px; border-top:1px solid var(--border); color:var(--accent)">
+          <span>Total</span><span>R$ {{ order.total }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENDEREÇO DE ENTREGA -->
+    <div class="card">
+      <div class="card__header">
+        <span class="card__title">Endereço de Entrega</span>
+      </div>
+      <div class="card__body" style="font-size:14px; display:flex; flex-direction:column; gap:6px; color:var(--muted)">
+        <p><strong style="color:var(--text)">{{ order.buyer_name }}</strong></p>
+        <p>{{ order.address_street }}, {{ order.address_number }}{% if order.address_complement %}, {{ order.address_complement }}{% endif %}</p>
+        <p>{{ order.address_neighborhood }} — {{ order.address_city }}/{{ order.address_state }}</p>
+        <p>CEP: {{ order.address_zip }}</p>
+        {% if order.buyer_phone %}<p>Tel: {{ order.buyer_phone }}</p>{% endif %}
+        {% if order.buyer_cpf %}<p>CPF: {{ order.buyer_cpf }}</p>{% endif %}
+      </div>
+    </div>
+
+    {% if order.notes %}
+    <div class="card">
+      <div class="card__header"><span class="card__title">Observações do Cliente</span></div>
+      <div class="card__body" style="font-size:14px; color:var(--muted)">{{ order.notes }}</div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- COLUNA DIREITA -->
+  <div style="display:flex; flex-direction:column; gap:20px;">
+
+    <!-- STATUS -->
+    <div class="card">
+      <div class="card__header"><span class="card__title">Atualizar Status</span></div>
+      <div class="card__body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group" style="margin-bottom:16px;">
+            <label>Status atual</label>
+            <select name="status">
+              {% for value, label in order.STATUS_CHOICES %}
+              <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn--primary" style="width:100%">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Salvar Status
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- DADOS DO PEDIDO -->
+    <div class="card">
+      <div class="card__header"><span class="card__title">Informações</span></div>
+      <div class="card__body" style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--muted)">Número</span>
+          <strong style="color:var(--accent)">{{ order.order_number }}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--muted)">Data</span>
+          <span>{{ order.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--muted)">Pagamento</span>
+          <span>{{ order.get_payment_method_display }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--muted)">Cliente</span>
+          <span>{{ order.buyer_name }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--muted)">E-mail</span>
+          <span style="font-size:12px">{{ order.buyer_email }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--muted)">Atualizado</span>
+          <span>{{ order.updated_at|date:"d/m H:i" }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

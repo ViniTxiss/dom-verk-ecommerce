@@ -1,0 +1,78 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Pedidos — DOM VERK{% endblock %}
+{% block breadcrumb %}Pedidos{% endblock %}
+{% block nav_orders %}active{% endblock %}
+
+{% block topbar_actions %}
+  <form method="get" style="display:flex; gap:8px; align-items:center">
+    <select name="status" onchange="this.form.submit()" style="width:auto; padding:7px 12px; font-size:13px;">
+      <option value="">Todos os status</option>
+      <option value="pending"    {% if status_filter == 'pending'    %}selected{% endif %}>Aguardando Pagamento</option>
+      <option value="paid"       {% if status_filter == 'paid'       %}selected{% endif %}>Pago</option>
+      <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>Em Processamento</option>
+      <option value="shipped"    {% if status_filter == 'shipped'    %}selected{% endif %}>Enviado</option>
+      <option value="delivered"  {% if status_filter == 'delivered'  %}selected{% endif %}>Entregue</option>
+      <option value="cancelled"  {% if status_filter == 'cancelled'  %}selected{% endif %}>Cancelado</option>
+    </select>
+  </form>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">Pedidos</h1>
+    <p class="page-header__sub">
+      {{ orders|length }} pedido(s){% if status_filter %} · Filtrando por: <strong>{{ status_filter }}</strong>{% endif %}
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    {% if orders %}
+    <table>
+      <thead>
+        <tr>
+          <th>Pedido</th>
+          <th>Cliente</th>
+          <th>Itens</th>
+          <th>Total</th>
+          <th>Pagamento</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td><strong style="color:var(--accent)">{{ order.order_number }}</strong></td>
+          <td>
+            <div style="font-weight:500">{{ order.buyer_name }}</div>
+            <div style="font-size:11px; color:var(--muted)">{{ order.buyer_email }}</div>
+          </td>
+          <td>{{ order.items.count }}</td>
+          <td><strong>R$ {{ order.total }}</strong></td>
+          <td style="color:var(--muted); font-size:12px">{{ order.get_payment_method_display }}</td>
+          <td><span class="badge badge--{{ order.status }}">{{ order.get_status_display }}</span></td>
+          <td style="color:var(--muted); font-size:12px">{{ order.created_at|date:"d/m/y H:i" }}</td>
+          <td>
+            <a href="{% url 'dashboard:order_detail' order.id %}" class="btn btn--ghost btn--sm">Abrir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17H5a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2h14"/></svg>
+      <h3>Nenhum pedido encontrado</h3>
+      <p>Tente outro filtro de status.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

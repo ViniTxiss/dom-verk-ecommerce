@@ -1,0 +1,109 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Produtos — DOM VERK{% endblock %}
+{% block breadcrumb %}Produtos{% endblock %}
+{% block nav_products %}active{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{% url 'dashboard:product_create' %}" class="btn btn--primary">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Novo Produto
+  </a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">Produtos</h1>
+    <p class="page-header__sub">{{ products|length }} produto(s) cadastrado(s)</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    {% if products %}
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th>Preço</th>
+          <th>Promo</th>
+          <th>Variantes</th>
+          <th>Flags</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:12px;">
+              {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                   style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid var(--border);">
+              {% else %}
+              <div style="width:40px; height:40px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center;">
+                <svg width="16" height="16" fill="none" stroke="var(--muted)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              {% endif %}
+              <div>
+                <div style="font-weight:600">{{ product.name }}</div>
+                <div style="font-size:11px; color:var(--muted)">{{ product.slug }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--muted); font-size:13px">{{ product.category.name|default:"—" }}</td>
+          <td><strong>R$ {{ product.price }}</strong></td>
+          <td>
+            {% if product.price_promo %}
+            <span style="color:var(--success); font-weight:600">R$ {{ product.price_promo }}</span>
+            {% else %}
+            <span style="color:var(--muted)">—</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--muted)">{{ product.variants.count }}</td>
+          <td>
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
+              {% if product.is_featured %}
+              <span class="badge badge--paid" style="font-size:10px; padding:2px 6px;">⭐ Destaque</span>
+              {% endif %}
+              {% if product.is_flash_deal %}
+              <span class="badge badge--pending" style="font-size:10px; padding:2px 6px;">⚡ Flash</span>
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            <span class="badge badge--{% if product.is_active %}active{% else %}inactive{% endif %}">
+              {% if product.is_active %}Ativo{% else %}Inativo{% endif %}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <a href="{% url 'dashboard:product_edit' product.id %}" class="btn btn--ghost btn--sm">Editar</a>
+              <form method="post" action="{% url 'dashboard:product_delete' product.id %}"
+                    onsubmit="return confirm('Excluir {{ product.name }}? Esta ação não pode ser desfeita.')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--danger btn--sm">Excluir</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <h3>Nenhum produto cadastrado</h3>
+      <p>Clique em "Novo Produto" para começar.</p>
+      <br>
+      <a href="{% url 'dashboard:product_create' %}" class="btn btn--primary">+ Novo Produto</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
