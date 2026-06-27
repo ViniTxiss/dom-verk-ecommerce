@@ -13,21 +13,23 @@
         <a href="{% url 'products:list' %}" class="nav-link">Loja</a>
       </li>
       <li class="nav-item nav-item--mega">
-        <a href="{% url 'products:list' %}?categoria=camisetas" class="nav-link">Camisetas</a>
+        <a href="{% url 'products:list' %}?categoria=camisetas" class="nav-link">Coleções</a>
         <div class="mega-menu">
           <div class="mega-menu__inner">
             <div class="mega-menu__col">
-              <h3 class="mega-menu__title">Por Tipo</h3>
-              <a href="{% url 'products:list' %}?categoria=basicas">Básicas</a>
-              <a href="{% url 'products:list' %}?categoria=graficas">Gráficas</a>
+              <h3 class="mega-menu__title">Categorias</h3>
+              <a href="{% url 'products:list' %}?categoria=camisetas">Camisetas</a>
               <a href="{% url 'products:list' %}?categoria=polo">Polo</a>
               <a href="{% url 'products:list' %}?categoria=manga-longa">Manga Longa</a>
+              <a href="{% url 'products:list' %}?categoria=hoodies">Hoodies / Casacos</a>
             </div>
             <div class="mega-menu__col">
               <h3 class="mega-menu__title">Por Tamanho</h3>
-              <a href="{% url 'products:list' %}?tamanho=P">P e PP</a>
+              <a href="{% url 'products:list' %}?tamanho=PP">PP</a>
+              <a href="{% url 'products:list' %}?tamanho=P">P</a>
               <a href="{% url 'products:list' %}?tamanho=M">M</a>
-              <a href="{% url 'products:list' %}?tamanho=G">G e GG</a>
+              <a href="{% url 'products:list' %}?tamanho=G">G</a>
+              <a href="{% url 'products:list' %}?tamanho=GG">GG</a>
               <a href="{% url 'products:list' %}?tamanho=2GG">Plus Size (2GG+)</a>
             </div>
             <div class="mega-menu__col">

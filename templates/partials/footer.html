@@ -62,20 +62,20 @@
 
     <div class="footer__col">
       <h4 class="footer__heading">Ajuda</h4>
-      <a href="#">Guia de Tamanhos</a>
-      <a href="#">Política de Troca</a>
-      <a href="#">Rastrear Pedido</a>
-      <a href="#">Formas de Pagamento</a>
-      <a href="#" target="_blank">WhatsApp</a>
+      <a href="{% url 'products:size_guide' %}">Guia de Tamanhos</a>
+      <a href="{% url 'products:exchanges' %}">Política de Troca</a>
+      <a href="{% url 'orders:history' %}">Rastrear Pedido</a>
+      <a href="{% url 'products:exchanges' %}#reembolso">Formas de Pagamento</a>
+      <a href="https://wa.me/5500000000000" target="_blank">WhatsApp</a>
     </div>
 
     <div class="footer__col">
       <h4 class="footer__heading">Empresa</h4>
-      <a href="#">Nossa História</a>
-      <a href="#">Sustentabilidade</a>
-      <a href="#">Trabalhe Conosco</a>
-      <a href="#">Política de Privacidade</a>
-      <a href="#">Termos de Uso</a>
+      <a href="{% url 'products:about' %}">Nossa História</a>
+      <a href="{% url 'products:about' %}#sustentabilidade">Sustentabilidade</a>
+      <a href="{% url 'products:about' %}#trabalhe">Trabalhe Conosco</a>
+      <a href="{% url 'products:privacy_policy' %}">Política de Privacidade</a>
+      <a href="{% url 'products:terms_of_use' %}">Termos de Uso</a>
     </div>
   </div>
 

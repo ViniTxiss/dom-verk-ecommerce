@@ -106,7 +106,7 @@
           <div class="pdp__selector">
             <label class="pdp__selector-label">
               Tamanho: <strong id="selected-size">—</strong>
-              <a href="#" class="size-guide-link">Guia de Tamanhos</a>
+              <a href="{% url 'products:size_guide' %}" target="_blank" class="size-guide-link">Guia de Tamanhos</a>
             </label>
             <div class="pdp__size-grid">
               {% for size in available_sizes %}

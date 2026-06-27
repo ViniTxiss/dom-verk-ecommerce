@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Guia de Tamanhos — DOM VERK{% endblock %}
+
+{% block content %}
+<section class="institutional-page" style="padding-block: 4rem 8rem; max-width: 900px; margin-inline: auto;">
+  <div class="container">
+    <h1 class="institutional-page__title" style="font-family: var(--font-head); font-size: clamp(2rem, 4vw, 3.2rem); margin-bottom: 2rem; color: var(--accent); font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+      Guia de Tamanhos
+    </h1>
+    <div class="institutional-page__content" style="color: rgba(242, 240, 236, 0.85); display: flex; flex-direction: column; gap: 1.5rem; line-height: 1.8; font-size: 1rem;">
+      <p>
+        Para garantir o caimento ideal da sua peça DOM VERK, consulte as tabelas de medidas abaixo. Recomendamos medir uma camiseta do seu guarda-roupa que você gosta do caimento e comparar as medidas.
+      </p>
+
+      <h2 style="font-family: var(--font-head); color: var(--text); font-size: 1.5rem; margin-top: 1.5rem;">Tabela de Medidas (Camisetas)</h2>
+      
+      <div style="overflow-x: auto; margin-block: 1rem; border: 1px solid var(--border); border-radius: 4px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border);">
+              <th style="padding: 12px; font-weight: 600; color: var(--accent);">Tamanho</th>
+              <th style="padding: 12px; font-weight: 600;">Largura (Peito)</th>
+              <th style="padding: 12px; font-weight: 600;">Comprimento (Altura)</th>
+              <th style="padding: 12px; font-weight: 600;">Manga</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">PP</td>
+              <td style="padding: 12px;">48 cm</td>
+              <td style="padding: 12px;">68 cm</td>
+              <td style="padding: 12px;">20 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">P</td>
+              <td style="padding: 12px;">51 cm</td>
+              <td style="padding: 12px;">71 cm</td>
+              <td style="padding: 12px;">21 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">M</td>
+              <td style="padding: 12px;">54 cm</td>
+              <td style="padding: 12px;">74 cm</td>
+              <td style="padding: 12px;">22 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">G</td>
+              <td style="padding: 12px;">57 cm</td>
+              <td style="padding: 12px;">77 cm</td>
+              <td style="padding: 12px;">23 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">GG</td>
+              <td style="padding: 12px;">60 cm</td>
+              <td style="padding: 12px;">80 cm</td>
+              <td style="padding: 12px;">24 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">2GG</td>
+              <td style="padding: 12px;">64 cm</td>
+              <td style="padding: 12px;">83 cm</td>
+              <td style="padding: 12px;">25 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">3GG</td>
+              <td style="padding: 12px;">68 cm</td>
+              <td style="padding: 12px;">86 cm</td>
+              <td style="padding: 12px;">26 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 12px; font-weight: 600; color: var(--text);">4GG</td>
+              <td style="padding: 12px;">72 cm</td>
+              <td style="padding: 12px;">89 cm</td>
+              <td style="padding: 12px;">27 cm</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 style="font-family: var(--font-head); color: var(--text); font-size: 1.5rem; margin-top: 1.5rem;">Como Medir</h2>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+        <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border: 1px solid var(--border); border-radius: 4px;">
+          <strong style="color: var(--accent); display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">1. Largura (Peito)</strong>
+          <span>Meça a distância entre as costuras das axilas da camiseta, esticada sobre uma mesa plana.</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border: 1px solid var(--border); border-radius: 4px;">
+          <strong style="color: var(--accent); display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">2. Altura (Comprimento)</strong>
+          <span>Meça da costura mais alta do ombro (próximo à gola) até a costura da barra inferior.</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border: 1px solid var(--border); border-radius: 4px;">
+          <strong style="color: var(--accent); display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">3. Manga</strong>
+          <span>Meça da costura do ombro até a barra da manga.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

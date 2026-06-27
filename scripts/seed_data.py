@@ -25,7 +25,7 @@ def create_categories():
     for name, slug, order in cats:
         cat, _ = Category.objects.get_or_create(slug=slug, defaults={'name': name, 'order': order})
         created.append(cat)
-        print(f'  ✓ Categoria: {name}')
+        print(f'  [OK] Categoria: {name}')
     return created
 
 def create_products(categories):
@@ -132,8 +132,8 @@ def create_products(categories):
         )
 
         if created:
-            print(f'  ✓ Produto: {product.name}')
-
+            print(f'  [OK] Produto: {product.name}')
+            
             # Criar variantes
             sizes = ['PP', 'P', 'M', 'G', 'GG', '2GG', '3GG', '4GG']
             for color in colors:
@@ -160,13 +160,13 @@ def create_products(categories):
                         defaults={'rating': rating, 'comment': comment}
                     )
         else:
-            print(f'  → Produto já existe: {product.name}')
+            print(f'  [INFO] Produto ja existe: {product.name}')
 
 if __name__ == '__main__':
-    print('\n🚀 Criando dados iniciais DOM VERK...\n')
-    print('📁 Categorias:')
+    print('\n[DOM VERK] Criando dados iniciais...\n')
+    print('Categorias:')
     categories = create_categories()
-    print('\n👕 Produtos:')
+    print('\nProdutos:')
     create_products(categories)
-    print('\n✅ Dados iniciais criados com sucesso!')
-    print('   Acesse http://127.0.0.1:8000/ para ver a loja\n')
+    print('\n[DOM VERK] Dados iniciais criados com sucesso!')
+    print('Acesse http://127.0.0.1:8000/ para ver a loja\n')

@@ -79,3 +79,23 @@ def product_detail(request, slug):
         'available_sizes': list(available_sizes),
     }
     return render(request, 'products/detail.html', context)
+
+
+def privacy_policy(request):
+    return render(request, 'institutional/privacy_policy.html')
+
+
+def terms_of_use(request):
+    return render(request, 'institutional/terms_of_use.html')
+
+
+def exchanges(request):
+    return render(request, 'institutional/exchanges.html')
+
+
+def about(request):
+    return render(request, 'institutional/about.html')
+
+
+def size_guide(request):
+    return render(request, 'institutional/size_guide.html')
