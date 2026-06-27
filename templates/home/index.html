@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DOM VERK — Moda que Fala por Você{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════ HERO ═══ -->
+<section class="hero" id="hero">
+  <div class="hero__bg">
+    <img
+      src="https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=1600&q=80"
+      alt="DOM VERK — Coleção"
+      class="hero__img"
+      onerror="this.style.display='none'"
+    >
+    <div class="hero__overlay"></div>
+  </div>
+  <div class="hero__content">
+    <p class="hero__eyebrow" data-aos="fade-up" data-aos-delay="100">Nova Coleção — 2025</p>
+    <h1 class="hero__title" data-aos="fade-up" data-aos-delay="200">
+      O fit que<br><em>define</em> o look.
+    </h1>
+    <p class="hero__sub" data-aos="fade-up" data-aos-delay="300">
+      Camisetas com identidade. Do PP ao 4GG.<br>
+      Tecidos premium, cortes que encaixam.
+    </p>
+    <div class="hero__ctas" data-aos="fade-up" data-aos-delay="400">
+      <a href="{% url 'products:list' %}" class="btn btn--accent btn--lg" id="hero-cta-primary">
+        Ver Coleção
+      </a>
+      <a href="{% url 'products:list' %}?flash=1" class="btn btn--ghost btn--lg" id="hero-cta-flash">
+        Flash Deals ⚡
+      </a>
+    </div>
+    <div class="hero__proof" data-aos="fade-up" data-aos-delay="500">
+      <div class="proof__stars">★★★★★</div>
+      <span>+12.000 clientes satisfeitos</span>
+    </div>
+  </div>
+  <div class="hero__scroll-hint">
+    <span>Role para baixo</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ CATEGORIES ═══ -->
+<section class="categories" id="categories">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <h2 class="section-title">Explore</h2>
+      <p class="section-sub">Encontre seu estilo</p>
+    </div>
+    <div class="categories__grid">
+      {% if categories %}
+        {% for category in categories %}
+        <a href="{% url 'products:list' %}?categoria={{ category.slug }}" class="cat-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
+          <div class="cat-card__img">
+            {% if category.image %}
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" onerror="this.src='https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400'">
+            {% else %}
+            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ category.name }}">
+            {% endif %}
+          </div>
+          <div class="cat-card__label">
+            <span>{{ category.name }}</span>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <!-- Placeholder categories -->
+        {% for cat_name in placeholder_categories %}
+        <a href="{% url 'products:list' %}" class="cat-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
+          <div class="cat-card__img">
+            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ cat_name }}">
+          </div>
+          <div class="cat-card__label">
+            <span>{{ cat_name }}</span>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </a>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FEATURED PRODUCTS ═══ -->
+<section class="products-section" id="featured">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <h2 class="section-title">Destaques</h2>
+      <a href="{% url 'products:list' %}" class="section-link">Ver todos →</a>
+    </div>
+    <div class="products-grid" id="featured-grid">
+      {% if featured_products %}
+        {% for product in featured_products %}
+        {% include 'partials/product_card.html' with product=product %}
+        {% endfor %}
+      {% else %}
+        <!-- Placeholder products when no featured exist -->
+        {% for i in "12345678"|make_list %}
+        <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
+          <div class="product-card__img-wrap">
+            <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80&sig={{ forloop.counter }}" alt="Camiseta DOM VERK" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=500'">
+            <div class="product-card__overlay">
+              <button class="btn btn--accent btn--sm">Escolher Tamanho</button>
+            </div>
+            <span class="product-card__badge product-card__badge--new">Novo</span>
+          </div>
+          <div class="product-card__info">
+            <p class="product-card__cat">Camisetas</p>
+            <h3 class="product-card__name">Camiseta DOM VERK Essential</h3>
+            <div class="product-card__price">
+              <span class="price--current">R$ 89,90</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ SPLIT BANNER ═══ -->
+<section class="split-banner" data-aos="fade-up">
+  <div class="split-banner__half split-banner__half--left">
+    <img src="https://images.unsplash.com/photo-1529720317453-c8da503f2051?w=800&q=80" alt="DOM VERK Masculino" onerror="this.src='https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=800'">
+    <div class="split-banner__content">
+      <h2>Para ele</h2>
+      <a href="{% url 'products:list' %}" class="btn btn--white">Explorar →</a>
+    </div>
+  </div>
+  <div class="split-banner__half split-banner__half--right">
+    <img src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=800&q=80" alt="DOM VERK Feminino" onerror="this.src='https://images.unsplash.com/photo-1594938298603-c8148c4b4c4a?w=800'">
+    <div class="split-banner__content">
+      <h2>Para ela</h2>
+      <a href="{% url 'products:list' %}" class="btn btn--white">Explorar →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FLASH DEALS ═══ -->
+<section class="flash-deals" id="flash-deals">
+  <div class="container">
+    <div class="flash-deals__header" data-aos="fade-up">
+      <div class="flash-deals__title-wrap">
+        <span class="flash-icon">⚡</span>
+        <h2 class="section-title">Flash Deals</h2>
+      </div>
+      <div class="flash-deals__timer" id="flash-timer">
+        <div class="timer-block"><span id="timer-h">00</span><small>h</small></div>
+        <span class="timer-sep">:</span>
+        <div class="timer-block"><span id="timer-m">00</span><small>m</small></div>
+        <span class="timer-sep">:</span>
+        <div class="timer-block"><span id="timer-s">00</span><small>s</small></div>
+      </div>
+    </div>
+    <div class="products-grid">
+      {% if flash_deals %}
+        {% for product in flash_deals %}
+        {% include 'partials/product_card.html' with product=product show_discount=True %}
+        {% endfor %}
+      {% else %}
+        {% for i in "1234"|make_list %}
+        <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}50">
+          <div class="product-card__img-wrap">
+            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80&sig=f{{ forloop.counter }}" alt="Flash Deal" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
+            <div class="product-card__overlay">
+              <button class="btn btn--accent btn--sm">Aproveitar</button>
+            </div>
+            <span class="product-card__badge product-card__badge--sale">-30%</span>
+          </div>
+          <div class="product-card__info">
+            <p class="product-card__cat">Camisetas</p>
+            <h3 class="product-card__name">Camiseta Essential Pack</h3>
+            <div class="product-card__price">
+              <span class="price--old">R$ 129,90</span>
+              <span class="price--current price--promo">R$ 89,90</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ VALUE PROPS ═══ -->
+<section class="value-props" data-aos="fade-up">
+  <div class="container">
+    <div class="value-props__grid">
+      <div class="value-prop" data-aos="fade-up" data-aos-delay="100">
+        <div class="value-prop__icon">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Qualidade Premium</h3>
+        <p>Tecido 100% algodão penteado, durável e confortável desde a primeira lavagem.</p>
+      </div>
+      <div class="value-prop" data-aos="fade-up" data-aos-delay="200">
+        <div class="value-prop__icon">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h3>Fit Perfeito</h3>
+        <p>Do PP ao 4GG, cada tamanho é desenvolvido para caimento ideal em todos os corpos.</p>
+      </div>
+      <div class="value-prop" data-aos="fade-up" data-aos-delay="300">
+        <div class="value-prop__icon">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </div>
+        <h3>Troca Garantida</h3>
+        <p>30 dias para troca ou devolução sem perguntas. Sua satisfação é nossa prioridade.</p>
+      </div>
+      <div class="value-prop" data-aos="fade-up" data-aos-delay="400">
+        <div class="value-prop__icon">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <h3>Entrega Rápida</h3>
+        <p>Frete grátis acima de R$199. Entrega para todo o Brasil em até 7 dias úteis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ SOCIAL PROOF ═══ -->
+<section class="social-proof" data-aos="fade-up">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">O que dizem sobre a DOM VERK</h2>
+      <div class="rating-summary">
+        <div class="rating-stars">★★★★★</div>
+        <strong>4.9</strong>
+        <span>de 5 · +12.000 avaliações</span>
+      </div>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Finalmente uma camiseta que cabe direito. O tecido é incrível, macio e não deforma após lavar. Já comprei 4 e vou comprar mais."</p>
+        <div class="review-author">
+          <div class="review-avatar">M</div>
+          <div>
+            <strong>Marcos S.</strong>
+            <span>São Paulo, SP · Tamanho G</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Comprei no tamanho 2GG e finalmente encontrei uma camiseta que fica bonita no meu corpo. A qualidade é outra, muito acima do esperado."</p>
+        <div class="review-author">
+          <div class="review-avatar">J</div>
+          <div>
+            <strong>Juliana R.</strong>
+            <span>Rio de Janeiro, RJ · Tamanho 2GG</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Entrega super rápida, embalagem caprichada e o produto superou as expectativas. O PIX com desconto foi um bônus incrível. Recomendo muito!"</p>
+        <div class="review-author">
+          <div class="review-avatar">R</div>
+          <div>
+            <strong>Rafael O.</strong>
+            <span>Curitiba, PR · Tamanho M</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ EMAIL CAPTURE ═══ -->
+<section class="email-capture" data-aos="fade-up">
+  <div class="container">
+    <div class="email-capture__inner">
+      <div class="email-capture__text">
+        <h2>Seja o primeiro a saber.</h2>
+        <p>Novidades, drops exclusivos e ofertas especiais direto no seu e-mail. Sem spam.</p>
+      </div>
+      <form class="email-capture__form" id="email-capture-form" onsubmit="handleEmailCapture(event)">
+        <input type="email" id="capture-email" placeholder="seu@email.com" required class="email-capture__input" aria-label="Seu e-mail">
+        <button type="submit" class="btn btn--accent" id="capture-submit">Quero receber</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Flash Deals Timer — termina à meia-noite de hoje
+function updateFlashTimer() {
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(23, 59, 59, 0);
+  const diff = midnight - now;
+  if (diff <= 0) return;
+
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('timer-h').textContent = pad(h);
+  document.getElementById('timer-m').textContent = pad(m);
+  document.getElementById('timer-s').textContent = pad(s);
+}
+updateFlashTimer();
+setInterval(updateFlashTimer, 1000);
+
+function handleEmailCapture(e) {
+  e.preventDefault();
+  const btn = document.getElementById('capture-submit');
+  btn.textContent = '✓ Inscrito!';
+  btn.disabled = true;
+  btn.style.background = '#22c55e';
+}
+</script>
+{% endblock %}

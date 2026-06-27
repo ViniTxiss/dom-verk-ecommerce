@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Meu Perfil — DOM VERK{% endblock %}
+{% block content %}
+<div class="container" style="padding-block:4rem; max-width: 720px;">
+  <h1 style="margin-bottom:2rem;">Meu Perfil</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-grid">
+      {% for field in form %}
+      <div class="form-group {% if field.name in 'first_name,last_name' %}{% else %}form-group--full{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div style="display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
+      <button type="submit" class="btn btn--accent">Salvar Alterações</button>
+      <a href="{% url 'orders:history' %}" class="btn btn--outline">Ver Pedidos</a>
+      <a href="{% url 'accounts:logout' %}" class="btn btn--ghost">Sair</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

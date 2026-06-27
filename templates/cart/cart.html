@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Carrinho — DOM VERK{% endblock %}
+
+{% block content %}
+<div class="cart-page container">
+  <h1 class="cart-page__title">Meu Carrinho</h1>
+
+  {% if cart|length == 0 %}
+  <div style="text-align:center; padding: 5rem 0;">
+    <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 1.5rem; opacity:.3;">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+    <h2 style="margin-bottom: 0.75rem; font-size: 1.5rem;">Seu carrinho está vazio</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Explore nossos produtos e encontre o seu estilo.</p>
+    <a href="{% url 'products:list' %}" class="btn btn--accent btn--lg">Explorar Loja</a>
+  </div>
+  {% else %}
+
+  <div class="cart-page-grid">
+    <!-- Itens -->
+    <div>
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Qtd</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+          {% if item.product and item.variant %}
+          <tr>
+            <td>
+              <div style="display:flex; gap:1rem; align-items:center;">
+                <a href="{% url 'products:detail' item.product.slug %}">
+                  {% if item.product.image %}
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:72px; height:96px; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80'">
+                  {% else %}
+                  <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80&q=80" alt="{{ item.product.name }}" style="width:72px; height:96px; object-fit:cover;">
+                  {% endif %}
+                </a>
+                <div>
+                  <a href="{% url 'products:detail' item.product.slug %}" style="font-weight:600; font-size:.9rem;">{{ item.product.name }}</a>
+                  <p style="font-size:.78rem; color:var(--text-muted); margin-top:.25rem;">{{ item.variant.get_color_display }} / {{ item.variant.size }}</p>
+                </div>
+              </div>
+            </td>
+            <td style="font-size:.9rem;">R$ {{ item.price|floatformat:2 }}</td>
+            <td>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="updateCartItem('{{ item.key }}', {{ item.quantity|add:'-1' }})">−</button>
+                <span class="qty-value">{{ item.quantity }}</span>
+                <button class="qty-btn" onclick="updateCartItem('{{ item.key }}', {{ item.quantity|add:'1' }})">+</button>
+              </div>
+            </td>
+            <td style="font-weight:700; color:var(--accent);">R$ {{ item.total_price|floatformat:2 }}</td>
+            <td>
+              <button onclick="removeCartItem('{{ item.key }}')" style="color:var(--text-muted); transition:.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div style="margin-top:2rem;">
+        <a href="{% url 'products:list' %}" class="btn btn--outline">← Continuar Comprando</a>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="checkout-summary" style="position:static;">
+      <h2 class="checkout-summary__title">Resumo</h2>
+      <div class="checkout-totals">
+        <div class="checkout-total-row">
+          <span>Subtotal</span>
+          <span>R$ {{ cart_total_price|floatformat:2 }}</span>
+        </div>
+        <div class="checkout-total-row" style="color:var(--success);">
+          <span>PIX (10% OFF)</span>
+          <span>- R$ {% widthratio cart_total_price 10 1 as pix_disc %}{{ pix_disc }}</span>
+        </div>
+        <div class="checkout-total-row">
+          <span>Frete estimado</span>
+          <span>{% if cart_total_price >= 199 %}<strong style="color:var(--success)">Grátis</strong>{% else %}R$ 19,90{% endif %}</span>
+        </div>
+        <div class="checkout-total-row checkout-total-row--total">
+          <strong>Total</strong>
+          <strong>R$ {{ cart_total_price|floatformat:2 }}</strong>
+        </div>
+      </div>
+
+      <div style="background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.2); padding:.875rem 1rem; margin-bottom:1.25rem; font-size:.82rem;">
+        <p style="color:var(--accent); font-weight:600; margin-bottom:.25rem;">💠 Pague com PIX e economize 10%</p>
+        <p style="color:var(--text-muted);">Desconto aplicado automaticamente no checkout.</p>
+      </div>
+
+      <a href="{% url 'orders:checkout' %}" class="btn btn--accent btn--full btn--lg">Finalizar Compra</a>
+
+      {% if cart_total_price < 199 %}
+      <p style="font-size:.75rem; color:var(--text-muted); text-align:center; margin-top:.75rem;">
+        Adicione mais R$ {{ cart_total_price|floatformat:2 }} para frete grátis!
+      </p>
+      {% else %}
+      <p style="font-size:.75rem; color:var(--success); text-align:center; margin-top:.75rem;">✓ Você ganhou frete grátis!</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

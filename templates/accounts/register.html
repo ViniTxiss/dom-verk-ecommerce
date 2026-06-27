@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Criar Conta — DOM VERK{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <a href="{% url 'products:home' %}" class="auth-logo">
+        <span class="logo-dom">DOM</span><span class="logo-verk">VERK</span>
+      </a>
+      <h1>Criar sua conta</h1>
+      <p>Junte-se à família DOM VERK</p>
+    </div>
+    <form method="POST" class="auth-form">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn--accent btn--full">Criar Conta</button>
+    </form>
+    <p class="auth-switch">
+      Já tem conta? <a href="{% url 'accounts:login' %}">Entrar</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

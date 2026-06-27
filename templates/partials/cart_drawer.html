@@ -1,0 +1,72 @@
+<!-- Cart Drawer -->
+<div class="cart-drawer-overlay" id="cart-drawer-overlay"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-drawer__header">
+    <h2 class="cart-drawer__title">Carrinho</h2>
+    <span class="cart-drawer__count" id="drawer-count">{{ cart_total_items }} item{% if cart_total_items != 1 %}s{% endif %}</span>
+    <button class="cart-drawer__close" id="cart-drawer-close">✕</button>
+  </div>
+
+  <div class="cart-drawer__body" id="cart-drawer-body">
+    {% if cart_total_items == 0 %}
+    <div class="cart-drawer__empty">
+      <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" opacity=".3">
+        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      <p>Seu carrinho está vazio.</p>
+      <a href="{% url 'products:list' %}" class="btn btn--outline" onclick="closeCartDrawer()">Ver Produtos</a>
+    </div>
+    {% else %}
+    {% for item in cart %}
+    {% if item.product and item.variant %}
+    <div class="cart-item" data-key="{{ item.key }}">
+      <div class="cart-item__img">
+        {% if item.product.image %}
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80'">
+        {% else %}
+        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80" alt="{{ item.product.name }}">
+        {% endif %}
+      </div>
+      <div class="cart-item__info">
+        <p class="cart-item__name">{{ item.product.name }}</p>
+        <p class="cart-item__variant">{{ item.variant.get_color_display }} / {{ item.variant.size }}</p>
+        <div class="cart-item__controls">
+          <div class="qty-control">
+            <button class="qty-btn" onclick="updateCartItem('{{ item.key }}', {{ item.quantity|add:'-1' }})">−</button>
+            <span class="qty-value">{{ item.quantity }}</span>
+            <button class="qty-btn" onclick="updateCartItem('{{ item.key }}', {{ item.quantity|add:'1' }})">+</button>
+          </div>
+          <button class="cart-item__remove" onclick="removeCartItem('{{ item.key }}')" aria-label="Remover">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="cart-item__price">R$ {{ item.total_price|floatformat:2 }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if cart_total_items > 0 %}
+  <div class="cart-drawer__footer">
+    <div class="cart-drawer__pix-badge">
+      <span>💠 PIX = 10% OFF</span>
+      <span class="pix-economy">economize R$ {{ cart_total_price|floatformat:2 }}</span>
+    </div>
+    <div class="cart-drawer__total">
+      <span>Total</span>
+      <strong id="drawer-total">R$ {{ cart_total_price|floatformat:2 }}</strong>
+    </div>
+    <a href="{% url 'orders:checkout' %}" class="btn btn--full btn--accent">Finalizar Compra</a>
+    <a href="{% url 'cart:detail' %}" class="btn btn--full btn--outline" style="margin-top: 0.5rem;">Ver Carrinho Completo</a>
+    {% if cart_total_price < 199 %}
+    <p class="cart-drawer__shipping-hint">
+      Falta <strong>R$ {{ cart_total_price|floatformat:2 }}</strong> para <strong>frete grátis</strong>!
+    </p>
+    {% else %}
+    <p class="cart-drawer__shipping-free">✓ Você ganhou frete grátis!</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

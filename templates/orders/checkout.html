@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout — DOM VERK{% endblock %}
+
+{% block content %}
+<div class="checkout-page">
+  <div class="container">
+    <h1 class="checkout-page__title">Finalizar Compra</h1>
+
+    <div class="checkout-grid">
+
+      <!-- ─── FORM ─── -->
+      <div class="checkout-form-col">
+        <form method="POST" id="checkout-form">
+          {% csrf_token %}
+
+          <!-- Dados Pessoais -->
+          <div class="checkout-section">
+            <h2 class="checkout-section__title">
+              <span class="step-number">1</span>
+              Dados Pessoais
+            </h2>
+            <div class="form-grid">
+              <div class="form-group form-group--full">
+                <label for="{{ form.buyer_name.id_for_label }}">{{ form.buyer_name.label }}</label>
+                {{ form.buyer_name }}
+                {% if form.buyer_name.errors %}<p class="form-error">{{ form.buyer_name.errors.0 }}</p>{% endif %}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.buyer_email.id_for_label }}">{{ form.buyer_email.label }}</label>
+                {{ form.buyer_email }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.buyer_phone.id_for_label }}">{{ form.buyer_phone.label }}</label>
+                {{ form.buyer_phone }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.buyer_cpf.id_for_label }}">{{ form.buyer_cpf.label }}</label>
+                {{ form.buyer_cpf }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div class="checkout-section">
+            <h2 class="checkout-section__title">
+              <span class="step-number">2</span>
+              Endereço de Entrega
+            </h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="{{ form.address_zip.id_for_label }}">{{ form.address_zip.label }}</label>
+                {{ form.address_zip }}
+              </div>
+              <div class="form-group form-group--wide">
+                <label for="{{ form.address_street.id_for_label }}">{{ form.address_street.label }}</label>
+                {{ form.address_street }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.address_number.id_for_label }}">{{ form.address_number.label }}</label>
+                {{ form.address_number }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.address_complement.id_for_label }}">{{ form.address_complement.label }}</label>
+                {{ form.address_complement }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.address_neighborhood.id_for_label }}">{{ form.address_neighborhood.label }}</label>
+                {{ form.address_neighborhood }}
+              </div>
+              <div class="form-group form-group--wide">
+                <label for="{{ form.address_city.id_for_label }}">{{ form.address_city.label }}</label>
+                {{ form.address_city }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.address_state.id_for_label }}">{{ form.address_state.label }}</label>
+                {{ form.address_state }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagamento -->
+          <div class="checkout-section">
+            <h2 class="checkout-section__title">
+              <span class="step-number">3</span>
+              Forma de Pagamento
+            </h2>
+            <div class="payment-methods">
+              <label class="payment-option payment-option--pix" id="payment-pix">
+                <input type="radio" name="payment_method" value="pix" checked>
+                <div class="payment-option__inner">
+                  <div class="payment-option__icon">💠</div>
+                  <div>
+                    <strong>PIX</strong>
+                    <span class="payment-option__badge">10% OFF</span>
+                    <p>Aprovação instantânea</p>
+                  </div>
+                </div>
+              </label>
+              <label class="payment-option" id="payment-card">
+                <input type="radio" name="payment_method" value="credit_card">
+                <div class="payment-option__inner">
+                  <div class="payment-option__icon">💳</div>
+                  <div>
+                    <strong>Cartão de Crédito</strong>
+                    <p>Até 4x sem juros</p>
+                  </div>
+                </div>
+              </label>
+              <label class="payment-option" id="payment-boleto">
+                <input type="radio" name="payment_method" value="boleto">
+                <div class="payment-option__inner">
+                  <div class="payment-option__icon">📄</div>
+                  <div>
+                    <strong>Boleto Bancário</strong>
+                    <p>Vence em 3 dias úteis</p>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Observações -->
+          <div class="checkout-section">
+            <div class="form-group form-group--full">
+              <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }} (opcional)</label>
+              {{ form.notes }}
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--accent btn--full btn--lg" id="checkout-submit">
+            Confirmar Pedido
+          </button>
+        </form>
+      </div>
+
+      <!-- ─── ORDER SUMMARY ─── -->
+      <div class="checkout-summary-col">
+        <div class="checkout-summary">
+          <h2 class="checkout-summary__title">Resumo do Pedido</h2>
+
+          <div class="checkout-items">
+            {% for item in cart %}
+            {% if item.product and item.variant %}
+            <div class="checkout-item">
+              <div class="checkout-item__img">
+                {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80'">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80" alt="{{ item.product.name }}">
+                {% endif %}
+                <span class="checkout-item__qty">{{ item.quantity }}</span>
+              </div>
+              <div class="checkout-item__info">
+                <p class="checkout-item__name">{{ item.product.name }}</p>
+                <p class="checkout-item__variant">{{ item.variant.get_color_display }} / {{ item.variant.size }}</p>
+              </div>
+              <p class="checkout-item__price">R$ {{ item.total_price|floatformat:2 }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+
+          <div class="checkout-totals">
+            <div class="checkout-total-row">
+              <span>Subtotal</span>
+              <span>R$ {{ subtotal|floatformat:2 }}</span>
+            </div>
+            <div class="checkout-total-row" id="pix-discount-row">
+              <span>Desconto PIX (10%)</span>
+              <span class="checkout-discount" id="pix-discount-val">- R$ 0,00</span>
+            </div>
+            <div class="checkout-total-row">
+              <span>Frete</span>
+              <span id="shipping-val">{% if subtotal >= 199 %}<strong style="color:var(--success)">Grátis</strong>{% else %}R$ 19,90{% endif %}</span>
+            </div>
+            <div class="checkout-total-row checkout-total-row--total">
+              <strong>Total</strong>
+              <strong id="total-val">R$ {{ subtotal|floatformat:2 }}</strong>
+            </div>
+          </div>
+
+          <div class="checkout-summary__secure">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Seus dados estão protegidos e criptografados</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const subtotal = {{ subtotal|floatformat:2 }};
+const shipping = subtotal >= 199 ? 0 : 19.90;
+
+function updateTotals(paymentMethod) {
+  const discount = paymentMethod === 'pix' ? subtotal * 0.10 : 0;
+  const total = subtotal - discount + shipping;
+
+  const discountRow = document.getElementById('pix-discount-row');
+  const discountVal = document.getElementById('pix-discount-val');
+  const totalVal = document.getElementById('total-val');
+
+  if (discount > 0) {
+    discountRow.style.display = 'flex';
+    discountVal.textContent = `- R$ ${discount.toFixed(2).replace('.', ',')}`;
+  } else {
+    discountRow.style.display = 'none';
+  }
+
+  totalVal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+    this.closest('.payment-option').classList.add('active');
+    updateTotals(this.value);
+  });
+});
+
+// Init with PIX
+updateTotals('pix');
+document.getElementById('payment-pix')?.classList.add('active');
+
+// Submit loading state
+document.getElementById('checkout-form')?.addEventListener('submit', function() {
+  const btn = document.getElementById('checkout-submit');
+  btn.textContent = 'Processando...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

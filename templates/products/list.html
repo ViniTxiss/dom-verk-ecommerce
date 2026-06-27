@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  {% if selected_category %}{{ selected_category.name }} — {% endif %}Loja — DOM VERK
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-block: 3rem 6rem;">
+
+  <!-- Header da listagem -->
+  <div class="section-header" style="margin-bottom: 2rem;">
+    <div>
+      <h1 class="section-title">
+        {% if selected_category %}{{ selected_category.name }}{% else %}Toda a Loja{% endif %}
+      </h1>
+      <p class="section-sub">{{ products.count }} produto{% if products.count != 1 %}s{% endif %} encontrado{% if products.count != 1 %}s{% endif %}</p>
+    </div>
+
+    <!-- Ordenar -->
+    <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+      <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em;">Ordenar:</span>
+      <a href="?ordenar=-created_at{% if selected_category %}&categoria={{ selected_category.slug }}{% endif %}"
+         class="filter-btn {% if current_sort == '-created_at' %}active{% endif %}">Mais Recentes</a>
+      <a href="?ordenar=price{% if selected_category %}&categoria={{ selected_category.slug }}{% endif %}"
+         class="filter-btn {% if current_sort == 'price' %}active{% endif %}">Menor Preço</a>
+      <a href="?ordenar=-price{% if selected_category %}&categoria={{ selected_category.slug }}{% endif %}"
+         class="filter-btn {% if current_sort == '-price' %}active{% endif %}">Maior Preço</a>
+    </div>
+  </div>
+
+  <!-- Filtros de Categoria -->
+  <div class="cat-filters" style="margin-bottom:2.5rem;">
+    <a href="{% url 'products:list' %}" class="cat-filter {% if not selected_category %}active{% endif %}">Todos</a>
+    {% for cat in categories %}
+    <a href="{% url 'products:list' %}?categoria={{ cat.slug }}" class="cat-filter {% if selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+    {% endfor %}
+  </div>
+
+  <!-- Grid de Produtos -->
+  {% if products %}
+  <div class="products-grid">
+    {% for product in products %}
+    {% include 'partials/product_card.html' with product=product %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align:center; padding:5rem 0; color:var(--text-muted);">
+    <p style="font-size:1.1rem; margin-bottom:1.5rem;">Nenhum produto encontrado.</p>
+    <a href="{% url 'products:list' %}" class="btn btn--outline">Ver Todos os Produtos</a>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.filter-btn {
+  padding: 0.4rem 0.875rem;
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(212,168,67,0.06);
+}
+.cat-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.cat-filter {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.cat-filter:hover, .cat-filter.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(212,168,67,0.06);
+}
+</style>
+{% endblock %}

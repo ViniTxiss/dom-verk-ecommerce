@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — DOM VERK{% endblock %}
+{% block meta_description %}{{ product.story|default:product.description|truncatewords:20 }}{% endblock %}
+
+{% block content %}
+<div class="pdp">
+  <div class="container">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="{% url 'products:home' %}">Início</a>
+      <span>/</span>
+      {% if product.category %}
+      <a href="{% url 'products:list' %}?categoria={{ product.category.slug }}">{{ product.category.name }}</a>
+      <span>/</span>
+      {% endif %}
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="pdp__grid">
+
+      <!-- ─── GALLERY ─── -->
+      <div class="pdp__gallery">
+        <div class="pdp__gallery-main">
+          {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" id="gallery-main" class="pdp__main-img" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700'">
+          {% else %}
+          <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700&q=80" alt="{{ product.name }}" id="gallery-main" class="pdp__main-img">
+          {% endif %}
+          {% if product.has_discount %}
+          <span class="pdp__discount-badge">-{{ product.discount_percent }}% OFF</span>
+          {% endif %}
+        </div>
+        {% if gallery %}
+        <div class="pdp__thumbs">
+          {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="gallery-thumb active" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150'">
+          {% endif %}
+          {% for img in gallery %}
+          <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" class="gallery-thumb">
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ─── INFO ─── -->
+      <div class="pdp__info">
+        {% if product.category %}
+        <p class="pdp__cat">{{ product.category.name }}</p>
+        {% endif %}
+        <h1 class="pdp__name">{{ product.name }}</h1>
+
+        <!-- Rating -->
+        {% if review_count > 0 %}
+        <div class="pdp__rating">
+          <div class="rating-stars">{% for i in "12345"|make_list %}{% if forloop.counter <= avg_rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+          <span>{{ avg_rating|floatformat:1 }} ({{ review_count }} avaliações)</span>
+        </div>
+        {% endif %}
+
+        <!-- Preço -->
+        <div class="pdp__price">
+          {% if product.has_discount %}
+          <span class="pdp__price-old">R$ {{ product.price|floatformat:2 }}</span>
+          <span class="pdp__price-current pdp__price-current--promo">R$ {{ product.current_price|floatformat:2 }}</span>
+          {% else %}
+          <span class="pdp__price-current">R$ {{ product.current_price|floatformat:2 }}</span>
+          {% endif %}
+        </div>
+        <p class="pdp__pix-hint">ou R$ {{ product.current_price|floatformat:2 }} à vista no PIX com 10% OFF</p>
+        <p class="pdp__installments">ou 4x de R$ {{ product.current_price|floatformat:2 }} sem juros</p>
+
+        <!-- Story do Produto (Chico Rei style) -->
+        {% if product.story %}
+        <div class="pdp__story">
+          <p>{{ product.story }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Formulário de Add to Cart -->
+        <form id="add-to-cart-form" method="POST" action="{% url 'cart:add' %}">
+          {% csrf_token %}
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="hidden" name="variant_id" id="variant-id-input" value="">
+          <input type="hidden" name="quantity" value="1">
+
+          <!-- Seletor de Cor -->
+          {% if available_colors %}
+          <div class="pdp__selector">
+            <label class="pdp__selector-label">Cor: <strong id="selected-color">—</strong></label>
+            <div class="pdp__color-grid">
+              {% for color in available_colors %}
+              <button type="button" class="color-swatch" data-color="{{ color }}"
+                onclick="selectColor(this, '{{ color }}')">
+                {{ color|capfirst }}
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Seletor de Tamanho -->
+          {% if available_sizes %}
+          <div class="pdp__selector">
+            <label class="pdp__selector-label">
+              Tamanho: <strong id="selected-size">—</strong>
+              <a href="#" class="size-guide-link">Guia de Tamanhos</a>
+            </label>
+            <div class="pdp__size-grid">
+              {% for size in available_sizes %}
+              <button type="button" class="size-swatch" data-size-btn="{{ size }}"
+                onclick="selectSize_pdp(this, '{{ size }}')">
+                {{ size }}
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Variantes ocultas para encontrar variant_id -->
+          <div style="display:none" id="variants-data">
+            {% for variant in product.variants.all %}
+            {% if variant.is_available %}
+            <span data-variant data-color="{{ variant.color }}" data-size="{{ variant.size }}" data-variant-id="{{ variant.id }}"></span>
+            {% endif %}
+            {% endfor %}
+          </div>
+
+          <button type="submit" class="btn btn--accent btn--full btn--lg" id="add-to-cart-btn" style="margin-top: 1.5rem;">
+            Adicionar ao Carrinho
+          </button>
+        </form>
+
+        <!-- Trust Badges -->
+        <div class="pdp__trust">
+          <div class="trust-item">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Pagamento 100% seguro</span>
+          </div>
+          <div class="trust-item">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>30 dias para troca</span>
+          </div>
+          <div class="trust-item">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <span>Frete grátis acima de R$199</span>
+          </div>
+        </div>
+
+        <!-- Descrição -->
+        {% if product.description %}
+        <div class="pdp__description">
+          <h3>Sobre a peça</h3>
+          <p>{{ product.description }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ─── REVIEWS ─── -->
+    {% if reviews %}
+    <section class="pdp__reviews">
+      <h2 class="section-title">Avaliações</h2>
+      <div class="reviews-grid">
+        {% for review in reviews %}
+        <div class="review-card" data-aos="fade-up">
+          <div class="review-stars">{{ review.rating }}★ {{ review.rating }}/5</div>
+          <p class="review-text">"{{ review.comment }}"</p>
+          <div class="review-author">
+            <div class="review-avatar">{{ review.user_name|first|upper }}</div>
+            <div>
+              <strong>{{ review.user_name }}</strong>
+              <span>{{ review.created_at|date:"d/m/Y" }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ─── RELATED PRODUCTS ─── -->
+    {% if related_products %}
+    <section class="pdp__related">
+      <div class="section-header">
+        <h2 class="section-title">Você também vai gostar</h2>
+      </div>
+      <div class="products-grid">
+        {% for product in related_products %}
+        {% include 'partials/product_card.html' with product=product %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedColor = null;
+let selectedSize = null;
+
+function selectColor(btn, color) {
+  document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedColor = color;
+  document.getElementById('selected-color').textContent = btn.textContent.trim();
+  findVariant();
+}
+
+function selectSize_pdp(btn, size) {
+  document.querySelectorAll('.size-swatch').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedSize = size;
+  document.getElementById('selected-size').textContent = size;
+  findVariant();
+}
+
+function findVariant() {
+  if (!selectedColor || !selectedSize) return;
+  const variants = document.querySelectorAll('[data-variant]');
+  for (const v of variants) {
+    if (v.dataset.color === selectedColor && v.dataset.size === selectedSize) {
+      document.getElementById('variant-id-input').value = v.dataset.variantId;
+      return;
+    }
+  }
+  document.getElementById('variant-id-input').value = '';
+}
+</script>
+{% endblock %}
