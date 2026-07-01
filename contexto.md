@@ -45,6 +45,7 @@ Para evitar reescrever ou quebrar padrões estabelecidos no código, siga estas 
 - **Management Command `seed`:** Criado `apps/products/management/commands/seed.py` — roda com `python manage.py seed`. **Este é o comando a rodar no Railway para popular o PostgreSQL de produção.** Idempotente.
 - **Footer social links:** Corrigidos os 3 `href="#"` de Instagram, TikTok e WhatsApp com URLs reais (perfis domverk). ⚠️ O número do WhatsApp em `footer.html` (linha 50) está como `5511999999999` — substitua pelo número real.
 - **Integração do Painel Admin:** Configurado o redirecionamento automático de usuários administradores (`is_staff`) diretamente para o painel após o login no site (`/conta/entrar/`). Adicionados atalhos condicionais de acesso ao painel (ícone de grade no desktop e link no menu mobile) visíveis apenas para perfis administradores.
+- **Simulação de Pagamento (PIX, Cartão e Boleto):** Implementado o simulador de pagamento diretamente na tela de confirmação de pedidos (`confirmation.html`). Criada a view `simulate_payment` em `apps/orders/views.py` que altera o status do pedido de 'pending' para 'paid' após o clique no botão de simulação correspondente ao método escolhido (geração de QR Code dinâmico para PIX, dados fictícios para Cartão ou boleto bancário simulado).
 
 ---
 
@@ -62,11 +63,7 @@ Caso os créditos da IA anterior tenham acabado, a IA atual deve começar pela *
 *   **Onde alterar:** `templates/orders/checkout.html` (ou script correspondente) e lógica de form.
 *   **Foco técnico:** UX (Experiência do Usuário) fluida e sem recarregamento de página.
 
-### 🟨 Prioridade 3: Simulação de Pagamento (PIX / Cartão)
-*   **O que fazer:** Criar uma página intermediária após finalizar o pedido que gera um QRCode estático para PIX (com código Copia e Cola) ou dados fictícios de cartão. Ao "confirmar", o status do pedido deve atualizar para "Pago".
-*   **Onde alterar:** `apps/orders/views.py` e criar template de confirmação de pagamento.
-
-### 🟥 Prioridade 4: Sistema de Cupons de Desconto
+### 🟥 Prioridade 3: Sistema de Cupons de Desconto
 *   **O que fazer:** Criar modelo `Coupon` (código, porcentagem/valor fixo, validade e ativo). Integrar aplicação de cupons no carrinho e na sessão de checkout com atualização dinâmica do total.
 
 ---
