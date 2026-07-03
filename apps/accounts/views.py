@@ -28,7 +28,12 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            next_url = request.GET.get('next', 'products:home')
+            next_url = request.GET.get('next')
+            if not next_url:
+                if user.is_staff:
+                    next_url = 'dashboard:home'
+                else:
+                    next_url = 'products:home'
             messages.success(request, f'Olá, {user.first_name or user.username}!')
             return redirect(next_url)
     else:

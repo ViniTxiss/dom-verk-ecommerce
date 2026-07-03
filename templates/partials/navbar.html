@@ -35,7 +35,7 @@
             <div class="mega-menu__col">
               <h3 class="mega-menu__title">Destaques</h3>
               <a href="{% url 'products:list' %}?ordenar=-created_at">Novidades</a>
-              <a href="{% url 'products:list' %}?flash=1">Flash Deals ⚡</a>
+              <a href="{% url 'products:list' %}?flash=1">Oferta Relâmpago ⚡</a>
               <a href="{% url 'products:list' %}?ordenar=price">Menor Preço</a>
             </div>
           </div>
@@ -43,7 +43,7 @@
       </li>
       <li class="nav-item">
         <a href="{% url 'products:list' %}?flash=1" class="nav-link nav-link--flash">
-          Flash Deals <span class="flash-badge">⚡</span>
+          Oferta Relâmpago <span class="flash-badge">⚡</span>
         </a>
       </li>
       <li class="nav-item">
@@ -59,6 +59,15 @@
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
       </button>
+
+      <!-- Painel Admin -->
+      {% if user.is_authenticated and user.is_staff %}
+      <a href="{% url 'dashboard:home' %}" class="nav-action nav-action--admin" title="Painel Admin" aria-label="Painel Admin" style="color: var(--accent);">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </a>
+      {% endif %}
 
       <!-- Conta -->
       {% if user.is_authenticated %}
@@ -112,14 +121,17 @@
   </div>
   <ul class="mobile-menu__links">
     <li><a href="{% url 'products:list' %}">Loja</a></li>
-    <li><a href="{% url 'products:list' %}?flash=1">Flash Deals ⚡</a></li>
+    <li><a href="{% url 'products:list' %}?flash=1">Oferta Relâmpago ⚡</a></li>
     <li><a href="{% url 'products:list' %}?ordenar=-created_at">Novidades</a></li>
     <li><a href="{% url 'products:list' %}?tamanho=2GG">Plus Size</a></li>
     <hr>
     {% if user.is_authenticated %}
-    <li><a href="{% url 'accounts:profile' %}">Minha Conta</a></li>
-    <li><a href="{% url 'orders:history' %}">Meus Pedidos</a></li>
-    <li><a href="{% url 'accounts:logout' %}">Sair</a></li>
+      {% if user.is_staff %}
+      <li><a href="{% url 'dashboard:home' %}" style="color: var(--accent); font-weight: 600;">Painel Admin ⚙️</a></li>
+      {% endif %}
+      <li><a href="{% url 'accounts:profile' %}">Minha Conta</a></li>
+      <li><a href="{% url 'orders:history' %}">Meus Pedidos</a></li>
+      <li><a href="{% url 'accounts:logout' %}">Sair</a></li>
     {% else %}
     <li><a href="{% url 'accounts:login' %}">Entrar</a></li>
     <li><a href="{% url 'accounts:register' %}">Criar Conta</a></li>

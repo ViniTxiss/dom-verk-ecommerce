@@ -1,41 +1,235 @@
 {% extends 'base.html' %}
+{% load order_filters %}
 {% block title %}Pedido Confirmado — DOM VERK{% endblock %}
 {% block content %}
-<div class="container" style="min-height: 60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding-block: 6rem; text-align:center;">
-  <div style="max-width: 560px; margin: 0 auto;">
-    <div style="width:80px; height:80px; border:2px solid var(--success); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 2rem; font-size:2rem;">✓</div>
-    <h1 style="font-size:2rem; margin-bottom:0.75rem;">Pedido Confirmado!</h1>
-    <p class="text-muted" style="margin-bottom:2rem; color:var(--text-muted); font-size:1.05rem;">
-      Obrigado pela sua compra, <strong>{{ order.buyer_name|first_name }}</strong>!<br>
-      Seu pedido <strong>#{{ order.order_number }}</strong> foi recebido com sucesso.
-    </p>
-    <div style="background:var(--surface); border:1px solid var(--border); padding:1.5rem; margin-bottom:2rem; text-align:left;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem;">
-        <span style="color:var(--text-muted); font-size:0.875rem;">Pedido</span>
+<div class="container" style="min-height: 70vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding-block: 4rem; padding-inline: 1rem;">
+  <div style="width: 100%; max-width: 580px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); text-align: center;">
+    
+    {% if order.status == 'paid' %}
+      <!-- SUCCESS ICON -->
+      <div style="width:80px; height:80px; border:2px solid var(--success); background: rgba(34,197,94,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; font-size:2.2rem; color: var(--success); animation: pulse 2s infinite;">✓</div>
+      <h1 style="font-size:2rem; margin-bottom:0.75rem; font-family: 'Space Grotesk', sans-serif; font-weight:700;">Pagamento Aprovado! 🎉</h1>
+      <p style="margin-bottom:2rem; color:var(--muted); font-size:1.05rem; line-height: 1.5;">
+        Obrigado pela sua compra, <strong>{{ order.buyer_name|first_name }}</strong>!<br>
+        Seu pagamento foi confirmado com sucesso. O pedido <strong>#{{ order.order_number }}</strong> agora está em fase de preparação para o envio.
+      </p>
+    {% else %}
+      <!-- PENDING ICON -->
+      <div style="width:80px; height:80px; border:2px solid var(--warning); background: rgba(245,158,11,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; font-size:2.2rem; color: var(--warning);">⚡</div>
+      <h1 style="font-size:2rem; margin-bottom:0.75rem; font-family: 'Space Grotesk', sans-serif; font-weight:700;">Pedido Recebido!</h1>
+      <p style="margin-bottom:2rem; color:var(--muted); font-size:1.05rem; line-height: 1.5;">
+        Obrigado, <strong>{{ order.buyer_name|first_name }}</strong>!<br>
+        Seu pedido <strong>#{{ order.order_number }}</strong> foi gerado. Aguardamos a confirmação do pagamento para prosseguir com o envio.
+      </p>
+    {% endif %}
+
+    <!-- ORDER SUMMARY TABLE -->
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; text-align: left;">
+      <h3 style="font-size: 1rem; margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: var(--accent);">Detalhes do Pedido</h3>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem; font-size: 0.95rem;">
+        <span style="color:var(--muted);">Número do Pedido</span>
         <strong>#{{ order.order_number }}</strong>
       </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem;">
-        <span style="color:var(--text-muted); font-size:0.875rem;">Total</span>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem; font-size: 0.95rem;">
+        <span style="color:var(--muted);">Valor Total</span>
         <strong style="color:var(--accent);">R$ {{ order.total|floatformat:2 }}</strong>
       </div>
-      <div style="display:flex; justify-content:space-between;">
-        <span style="color:var(--text-muted); font-size:0.875rem;">Pagamento</span>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem; font-size: 0.95rem;">
+        <span style="color:var(--muted);">Forma de Pagamento</span>
         <strong>{{ order.get_payment_method_display }}</strong>
       </div>
+      <div style="display:flex; justify-content:space-between; font-size: 0.95rem;">
+        <span style="color:var(--muted);">Status</span>
+        {% if order.status == 'paid' %}
+          <span style="color: var(--success); font-weight: 700;">● Pago</span>
+        {% else %}
+          <span style="color: var(--warning); font-weight: 700;">● Aguardando Pagamento</span>
+        {% endif %}
+      </div>
     </div>
-    {% if order.payment_method == 'pix' %}
-    <div style="background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.2); padding:1.25rem; margin-bottom:2rem; text-align:center;">
-      <p style="color:var(--accent); font-weight:700; margin-bottom:0.5rem;">💠 Pagamento via PIX</p>
-      <p style="font-size:0.875rem; color:var(--text-muted);">Você economizou <strong style="color:var(--accent);">R$ {{ order.discount|floatformat:2 }}</strong> com o desconto PIX!</p>
-      <p style="font-size:0.85rem; margin-top:0.75rem;">Realize o pagamento para confirmar o envio do seu pedido.</p>
-    </div>
+
+    <!-- PAYMENT SIMULATOR BOX -->
+    {% if order.status == 'pending' %}
+      <div style="background: rgba(200,169,110,0.05); border: 1px solid rgba(200,169,110,0.15); border-radius: 12px; padding: 1.75rem; margin-bottom: 2.5rem; text-align: center;">
+        
+        {% if order.payment_method == 'pix' %}
+          <!-- PIX INTERACTION -->
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #32bcad; font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">
+            <svg width="22" height="22" fill="currentColor" viewBox="0 0 512 512" style="display: inline-block;"><path d="M256 0c141.4 0 256 114.6 256 256S397.4 512 256 512 0 397.4 0 256 114.6 0 256 0zm0 435.2c99 0 179.2-80.2 179.2-179.2S355 76.8 256 76.8 76.8 157 76.8 256 157 435.2 256 435.2zM256 128l96 96H288v96h-64v-96H160l96-96z"/></svg>
+            Pagamento via PIX (10% OFF ativo)
+          </div>
+          <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem;">
+            Escaneie o QR Code abaixo com o app do seu banco ou use a chave Copia e Cola.
+          </p>
+          
+          <!-- Mock QR Code SVG -->
+          <div style="background: white; padding: 12px; display: inline-block; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+            <svg width="150" height="150" viewBox="0 0 100 100" style="display: block;">
+              <!-- Outer border & corners -->
+              <rect x="5" y="5" width="20" height="20" fill="black"/>
+              <rect x="8" y="8" width="14" height="14" fill="white"/>
+              <rect x="11" y="11" width="8" height="8" fill="black"/>
+              
+              <rect x="75" y="5" width="20" height="20" fill="black"/>
+              <rect x="78" y="8" width="14" height="14" fill="white"/>
+              <rect x="81" y="11" width="8" height="8" fill="black"/>
+              
+              <rect x="5" y="75" width="20" height="20" fill="black"/>
+              <rect x="8" y="78" width="14" height="14" fill="white"/>
+              <rect x="11" y="81" width="8" height="8" fill="black"/>
+              
+              <!-- Random pattern paths representing QR blocks -->
+              <path d="M35 10 h10 v10 h-10 z M60 10 h10 v5 h-10 z M50 25 h15 v5 h-15 z M30 35 h5 v15 h-5 z M45 40 h15 v5 h-15 z M70 40 h10 v10 h-10 z M15 35 h10 v10 h-10 z M10 60 h10 v5 h-10 z M35 60 h15 v5 h-15 z M60 65 h10 v15 h-10 z M75 60 h15 v5 h-15 z M40 75 h10 v15 h-10 z M45 80 h5 v10 h-5 z M80 80 h10 v10 h-10 z M55 50 h5 v15 h-5 z M35 50 h5 v5 h-5 z M65 20 h5 v5 h-5 z" fill="black"/>
+              <!-- Center branding block -->
+              <rect x="42" y="42" width="16" height="16" rx="3" fill="#32bcad"/>
+              <path d="M46 50 l4 4 l6-6" fill="none" stroke="white" stroke-width="2"/>
+            </svg>
+          </div>
+
+          <!-- Copia e Cola Field -->
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.8rem; text-align: left; margin-bottom: 0.5rem; color: var(--muted); text-transform: uppercase;">Chave Copia e Cola PIX</p>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="pix-code" value="00020101021226870014br.gov.bcb.pix2565domverkpixproducao20250630totalval{{ order.total }}" readonly style="flex: 1; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-family: monospace;">
+              <button onclick="copyPixCode()" id="copy-btn" class="btn btn--ghost" style="padding: 8px 12px; flex-shrink: 0; font-size: 0.85rem; border-color: var(--border);">Copiar</button>
+            </div>
+          </div>
+
+          <!-- Simulated Pay Form -->
+          <form action="{% url 'orders:simulate_payment' order.id %}" method="POST" style="margin-top: 1.5rem;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--accent" style="width: 100%; padding: 12px; justify-content: center; font-weight: 700; letter-spacing: 0.5px; border-radius: 8px;">
+              💸 Simular Confirmação de Pagamento PIX
+            </button>
+          </form>
+
+        {% elif order.payment_method == 'credit_card' %}
+          <!-- CREDIT CARD INTERACTION -->
+          <div style="color: var(--accent); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Pagamento via Cartão de Crédito
+          </div>
+          
+          <!-- Mockup Credit Card Visual -->
+          <div style="width: 100%; max-width: 340px; height: 180px; background: linear-gradient(135deg, #111116 0%, #20202d 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.5rem; text-align: left; display: flex; flex-direction: column; justify-content: space-between; margin: 0 auto 1.5rem; box-shadow: 0 6px 20px rgba(0,0,0,0.3); color: white; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: -20px; bottom: -20px; width: 120px; height: 120px; border-radius: 50%; background: rgba(200,169,110,0.05); pointer-events: none;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 2px; color: var(--accent); font-size: 0.95rem;">DOM VERK</span>
+              <svg width="36" height="24" viewBox="0 0 24 16" style="opacity: 0.85;">
+                <circle cx="8" cy="8" r="8" fill="#eb001b"/>
+                <circle cx="16" cy="8" r="8" fill="#ff5f00" fill-opacity="0.8"/>
+              </svg>
+            </div>
+            <div style="font-size: 1.25rem; font-family: monospace; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-top: 1rem;">
+              •••• •••• •••• 4242
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 0.5rem;">
+              <div>
+                <span style="font-size: 0.65rem; color: var(--muted); text-transform: uppercase; display: block; letter-spacing: 0.5px;">Titular</span>
+                <span style="font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.5px;">{{ order.buyer_name }}</span>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.65rem; color: var(--muted); text-transform: uppercase; display: block; letter-spacing: 0.5px;">Validade</span>
+                <span style="font-size: 0.85rem; font-family: monospace;">12/30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulated Pay Form -->
+          <form action="{% url 'orders:simulate_payment' order.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--accent" style="width: 100%; padding: 12px; justify-content: center; font-weight: 700; letter-spacing: 0.5px; border-radius: 8px;">
+              💳 Simular Aprovação de Cartão
+            </button>
+          </form>
+
+        {% else %}
+          <!-- BOLETO INTERACTION -->
+          <div style="color: var(--accent); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><path d="M10 9v6M14 9v6M6 9v6M18 9v6"/></svg>
+            Pagamento via Boleto Bancário
+          </div>
+          <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem;">
+            Copie a linha digitável do boleto ou simule a compensação bancária.
+          </p>
+
+          <!-- Mock Barcode CSS -->
+          <div style="background: var(--surface2); border: 1px dashed var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 6px; align-items: center; margin-bottom: 1.5rem;">
+            <div style="width: 100%; max-width: 280px; height: 40px; display: flex; justify-content: space-between; overflow: hidden; opacity: 0.7;">
+              {% for i in "12113121141213112112312114121"|make_list %}
+                <div style="background: var(--text); width: {{ i }}px; height: 100%;"></div>
+              {% endfor %}
+            </div>
+            <span style="font-size: 0.75rem; font-family: monospace; color: var(--muted);">34191.79001 01043.513184 91020.150008 7 900200000{{ order.total|floatformat:0 }}</span>
+          </div>
+
+          <!-- Simulated Pay Form -->
+          <form action="{% url 'orders:simulate_payment' order.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--accent" style="width: 100%; padding: 12px; justify-content: center; font-weight: 700; letter-spacing: 0.5px; border-radius: 8px;">
+              🧾 Simular Compensação do Boleto
+            </button>
+          </form>
+
+        {% endif %}
+      </div>
+    {% else %}
+      <!-- PAID DETAILS BOX -->
+      <div style="background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15); border-radius: 12px; padding: 1.75rem; margin-bottom: 2.5rem;">
+        <p style="color: var(--success); font-weight: 700; margin-bottom: 0.5rem;">🚀 Pagamento Confirmado e Postagem Pendente</p>
+        <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.4;">
+          A simulação de pagamento foi aprovada no sistema. O status deste pedido agora é definitivo. O código de rastreamento será gerado assim que o produto for coletado pela transportadora.
+        </p>
+      </div>
     {% endif %}
+
+    <!-- NAVIGATION CTAs -->
     <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
-      <a href="{% url 'products:home' %}" class="btn btn--accent">Continuar Comprando</a>
+      <a href="{% url 'products:home' %}" class="btn btn--accent" style="padding: 10px 20px;">
+        Continuar Comprando
+      </a>
       {% if user.is_authenticated %}
-      <a href="{% url 'orders:history' %}" class="btn btn--outline">Meus Pedidos</a>
+        <a href="{% url 'orders:history' %}" class="btn btn--ghost" style="padding: 10px 20px; border-color: var(--border);">
+          Meus Pedidos
+        </a>
       {% endif %}
     </div>
+
   </div>
 </div>
+
+<!-- Extra Javascript to handle Clipboard Copy -->
+<script>
+function copyPixCode() {
+  const pixInput = document.getElementById("pix-code");
+  const copyBtn = document.getElementById("copy-btn");
+  
+  if (pixInput) {
+    pixInput.select();
+    pixInput.setSelectionRange(0, 99999); /* For mobile devices */
+    
+    navigator.clipboard.writeText(pixInput.value).then(() => {
+      copyBtn.textContent = "Copiado!";
+      copyBtn.style.color = "var(--success)";
+      copyBtn.style.borderColor = "var(--success)";
+      
+      setTimeout(() => {
+        copyBtn.textContent = "Copiar";
+        copyBtn.style.color = "var(--muted)";
+        copyBtn.style.borderColor = "var(--border)";
+      }, 2500);
+    }).catch(err => {
+      console.error("Erro ao copiar código: ", err);
+    });
+  }
+}
+</script>
+
+<style>
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+</style>
 {% endblock %}

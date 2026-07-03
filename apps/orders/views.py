@@ -81,6 +81,18 @@ def order_confirmation(request, order_id):
     return render(request, 'orders/confirmation.html', {'order': order})
 
 
+def simulate_payment(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        if order.status == 'pending':
+            order.status = 'paid'
+            order.save()
+            messages.success(request, 'Simulação de pagamento aprovada! Seu pedido foi confirmado.')
+        else:
+            messages.warning(request, 'Este pedido já não está pendente de pagamento.')
+    return redirect('orders:confirmation', order_id=order_id)
+
+
 @login_required
 def order_history(request):
     orders = Order.objects.filter(user=request.user).prefetch_related('items')
