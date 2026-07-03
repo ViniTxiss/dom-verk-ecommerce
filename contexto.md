@@ -46,6 +46,9 @@ Para evitar reescrever ou quebrar padrões estabelecidos no código, siga estas 
 - **Footer social links:** Corrigidos os 3 `href="#"` de Instagram, TikTok e WhatsApp com URLs reais (perfis domverk). ⚠️ O número do WhatsApp em `footer.html` (linha 50) está como `5511999999999` — substitua pelo número real.
 - **Integração do Painel Admin:** Configurado o redirecionamento automático de usuários administradores (`is_staff`) diretamente para o painel após o login no site (`/conta/entrar/`). Adicionados atalhos condicionais de acesso ao painel (ícone de grade no desktop e link no menu mobile) visíveis apenas para perfis administradores.
 - **Simulação de Pagamento (PIX, Cartão e Boleto):** Implementado o simulador de pagamento diretamente na tela de confirmação de pedidos (`confirmation.html`). Criada a view `simulate_payment` em `apps/orders/views.py` que altera o status do pedido de 'pending' para 'paid' após o clique no botão de simulação correspondente ao método escolhido (geração de QR Code dinâmico para PIX, dados fictícios para Cartão ou boleto bancário simulado).
+- **Tradução de Termos:** Alteração de "Flash Deals" para "Oferta Relâmpago" na navegação desktop/mobile, cabeçalho, rodapé, barra de anúncio e painel de administração de produtos.
+- **Integração de Produtos FIOTECH:** Substituição total do catálogo antigo por 5 novos produtos da FIOTECH (Camiseta Dryfit, Conjunto Top/Legging, Short Fitness, Top Nadador e Camiseta Oversized). Foram geradas imagens premium via IA para cada produto, criadas novas categorias (Fitness, Feminino, Conjuntos), adicionadas cores (Rosa, Café, Capuccino) com migração de banco e correção de colisão de SKUs.
+- **Vídeo de Background no Hero:** Substituição da imagem de fundo estática no hero da página inicial por um loop de vídeo em tela cheia (`Black_t-shirt_with_print_202607022204.mp4`), estilizado para preenchimento cover responsivo.
 
 ---
 

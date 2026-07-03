@@ -91,6 +91,9 @@ COLOR_CHOICES = [
     ('vinho', 'Vinho'),
     ('bege', 'Bege'),
     ('areia', 'Areia'),
+    ('rosa', 'Rosa'),
+    ('cafe', 'Café'),
+    ('capuccino', 'Capuccino'),
 ]
 
 SIZE_CHOICES = [
@@ -123,7 +126,7 @@ class ProductVariant(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.sku:
-            self.sku = f"DV-{self.product.id}-{self.color[:2].upper()}-{self.size}"
+            self.sku = f"DV-{self.product.id}-{self.color.upper()}-{self.size}"
         super().save(*args, **kwargs)
 
 

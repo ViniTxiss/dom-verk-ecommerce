@@ -35,7 +35,7 @@
             <div class="mega-menu__col">
               <h3 class="mega-menu__title">Destaques</h3>
               <a href="{% url 'products:list' %}?ordenar=-created_at">Novidades</a>
-              <a href="{% url 'products:list' %}?flash=1">Flash Deals ⚡</a>
+              <a href="{% url 'products:list' %}?flash=1">Oferta Relâmpago ⚡</a>
               <a href="{% url 'products:list' %}?ordenar=price">Menor Preço</a>
             </div>
           </div>
@@ -43,7 +43,7 @@
       </li>
       <li class="nav-item">
         <a href="{% url 'products:list' %}?flash=1" class="nav-link nav-link--flash">
-          Flash Deals <span class="flash-badge">⚡</span>
+          Oferta Relâmpago <span class="flash-badge">⚡</span>
         </a>
       </li>
       <li class="nav-item">
@@ -121,7 +121,7 @@
   </div>
   <ul class="mobile-menu__links">
     <li><a href="{% url 'products:list' %}">Loja</a></li>
-    <li><a href="{% url 'products:list' %}?flash=1">Flash Deals ⚡</a></li>
+    <li><a href="{% url 'products:list' %}?flash=1">Oferta Relâmpago ⚡</a></li>
     <li><a href="{% url 'products:list' %}?ordenar=-created_at">Novidades</a></li>
     <li><a href="{% url 'products:list' %}?tamanho=2GG">Plus Size</a></li>
     <hr>

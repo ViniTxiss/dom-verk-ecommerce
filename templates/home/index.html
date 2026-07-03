@@ -8,12 +8,9 @@
 <!-- ═══════════════════════════════════════════ HERO ═══ -->
 <section class="hero" id="hero">
   <div class="hero__bg">
-    <img
-      src="https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=1600&q=80"
-      alt="DOM VERK — Coleção"
-      class="hero__img"
-      onerror="this.style.display='none'"
-    >
+    <video autoplay loop muted playsinline class="hero__video">
+      <source src="/media/products/Black_t-shirt_with_print_202607022204.mp4" type="video/mp4">
+    </video>
     <div class="hero__overlay"></div>
   </div>
   <div class="hero__content">
@@ -30,7 +27,7 @@
         Ver Coleção
       </a>
       <a href="{% url 'products:list' %}?flash=1" class="btn btn--ghost btn--lg" id="hero-cta-flash">
-        Flash Deals ⚡
+        Oferta Relâmpago ⚡
       </a>
     </div>
     <div class="hero__proof" data-aos="fade-up" data-aos-delay="500">
@@ -147,7 +144,7 @@
     <div class="flash-deals__header" data-aos="fade-up">
       <div class="flash-deals__title-wrap">
         <span class="flash-icon">⚡</span>
-        <h2 class="section-title">Flash Deals</h2>
+        <h2 class="section-title">Oferta Relâmpago</h2>
       </div>
       <div class="flash-deals__timer" id="flash-timer">
         <div class="timer-block"><span id="timer-h">00</span><small>h</small></div>
@@ -166,7 +163,7 @@
         {% for i in "1234"|make_list %}
         <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}50">
           <div class="product-card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80&sig=f{{ forloop.counter }}" alt="Flash Deal" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
+            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80&sig=f{{ forloop.counter }}" alt="Oferta Relâmpago" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
             <div class="product-card__overlay">
               <button class="btn btn--accent btn--sm">Aproveitar</button>
             </div>
