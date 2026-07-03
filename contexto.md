@@ -49,6 +49,8 @@ Para evitar reescrever ou quebrar padrões estabelecidos no código, siga estas 
 - **Tradução de Termos:** Alteração de "Flash Deals" para "Oferta Relâmpago" na navegação desktop/mobile, cabeçalho, rodapé, barra de anúncio e painel de administração de produtos.
 - **Integração de Produtos FIOTECH:** Substituição total do catálogo antigo por 5 novos produtos da FIOTECH (Camiseta Dryfit, Conjunto Top/Legging, Short Fitness, Top Nadador e Camiseta Oversized). Foram geradas imagens premium via IA para cada produto, criadas novas categorias (Fitness, Feminino, Conjuntos), adicionadas cores (Rosa, Café, Capuccino) com migração de banco e correção de colisão de SKUs.
 - **Vídeo de Background no Hero:** Substituição da imagem de fundo estática no hero da página inicial por um loop de vídeo em tela cheia (`Black_t-shirt_with_print_202607022204.mp4`), estilizado para preenchimento cover responsivo.
+- **Serviço de Mídia em Produção:** Adição da view de static serve no `core/urls.py` para servir arquivos sob `/media/` mesmo com `DEBUG=False` em produção (Railway), garantindo a exibição do vídeo do hero e imagens dos produtos.
+
 
 ---
 

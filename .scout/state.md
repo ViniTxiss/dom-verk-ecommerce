@@ -55,4 +55,12 @@ Arquivos tocados:
 - Todos os arquivos modificados e criados na sessão.
 
 
+## 2026-07-02 — Configuração para Servir Mídias em Produção
+Status: concluído
+Motivo/resultado: Adição da rota de `re_path` para servir arquivos de `/media/` via Django `serve` view quando `DEBUG=False` em produção (Railway).
+Arquivos tocados:
+- [core/urls.py](file:///c:/Users/vini/Desktop/projetos/E-COMMERCE/core/urls.py)
+
+
+
 
