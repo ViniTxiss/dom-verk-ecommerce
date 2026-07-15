@@ -63,19 +63,21 @@ class OrderConfirmationViewTest(TestCase):
 class CheckoutPostViewTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.category = Category.objects.create(name='Camisetas', slug='camisetas')
-        self.product = Product.objects.create(
-            name='Camiseta Barata',
+        self.category, _ = Category.objects.get_or_create(slug='camisetas', defaults={'name': 'Camisetas'})
+        self.product, _ = Product.objects.get_or_create(
             slug='camiseta-barata',
-            category=self.category,
-            price=100.00,
-            is_active=True
+            defaults={
+                'name': 'Camiseta Barata',
+                'category': self.category,
+                'price': 100.00,
+                'is_active': True
+            }
         )
-        self.variant = ProductVariant.objects.create(
+        self.variant, _ = ProductVariant.objects.get_or_create(
             product=self.product,
             color='preto',
             size='M',
-            stock=10
+            defaults={'stock': 10, 'is_available': True}
         )
         # Adicionar item ao carrinho (subtotal 100 < 199, frete 19.90 deve ser calculado em Decimal)
         self.client.post(
@@ -114,33 +116,33 @@ class CheckoutPostViewTest(TestCase):
 
 class CouponModelTest(TestCase):
     def test_coupon_upper_case(self):
-        coupon = Coupon.objects.create(code='promo10', discount_type='percentage', discount_value=10)
-        self.assertEqual(coupon.code, 'PROMO10')
+        coupon, _ = Coupon.objects.get_or_create(code='PROMO10_TEST', defaults={'discount_type': 'percentage', 'discount_value': 10})
+        self.assertEqual(coupon.code, 'PROMO10_TEST')
 
     def test_coupon_validity_active(self):
-        coupon = Coupon.objects.create(code='TEST10', discount_type='percentage', discount_value=10)
+        coupon, _ = Coupon.objects.get_or_create(code='TEST10', defaults={'discount_type': 'percentage', 'discount_value': 10})
         is_valid, msg = coupon.is_valid(subtotal=50)
         self.assertTrue(is_valid)
 
     def test_coupon_validity_inactive(self):
-        coupon = Coupon.objects.create(code='INACTIVE', discount_type='percentage', discount_value=10, active=False)
+        coupon, _ = Coupon.objects.get_or_create(code='INACTIVE', defaults={'discount_type': 'percentage', 'discount_value': 10, 'active': False})
         is_valid, msg = coupon.is_valid(subtotal=50)
         self.assertFalse(is_valid)
 
     def test_coupon_min_purchase_value(self):
-        coupon = Coupon.objects.create(code='MIN100', discount_type='fixed', discount_value=20, min_purchase_value=100)
+        coupon, _ = Coupon.objects.get_or_create(code='MIN100', defaults={'discount_type': 'fixed', 'discount_value': 20, 'min_purchase_value': 100})
         is_valid_low, _ = coupon.is_valid(subtotal=50)
         self.assertFalse(is_valid_low)
         is_valid_high, _ = coupon.is_valid(subtotal=150)
         self.assertTrue(is_valid_high)
 
     def test_coupon_calculate_discount_percentage(self):
-        coupon = Coupon.objects.create(code='PERC10', discount_type='percentage', discount_value=10)
+        coupon, _ = Coupon.objects.get_or_create(code='PERC10', defaults={'discount_type': 'percentage', 'discount_value': 10})
         discount = coupon.calculate_discount(Decimal('200.00'))
         self.assertEqual(discount, Decimal('20.00'))
 
     def test_coupon_calculate_discount_fixed(self):
-        coupon = Coupon.objects.create(code='FIXED15', discount_type='fixed', discount_value=15)
+        coupon, _ = Coupon.objects.get_or_create(code='FIXED15', defaults={'discount_type': 'fixed', 'discount_value': 15})
         discount = coupon.calculate_discount(Decimal('50.00'))
         self.assertEqual(discount, Decimal('15.00'))
 
@@ -148,20 +150,22 @@ class CouponModelTest(TestCase):
 class CouponViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.coupon = Coupon.objects.create(code='DOM10', discount_type='percentage', discount_value=10)
-        self.category = Category.objects.create(name='Camisetas', slug='camisetas')
-        self.product = Product.objects.create(
-            name='Camiseta Teste',
-            slug='camiseta-teste',
-            category=self.category,
-            price=100.00,
-            is_active=True
+        self.coupon, _ = Coupon.objects.get_or_create(code='DOM10', defaults={'discount_type': 'percentage', 'discount_value': 10})
+        self.category, _ = Category.objects.get_or_create(slug='camisetas', defaults={'name': 'Camisetas'})
+        self.product, _ = Product.objects.get_or_create(
+            slug='camiseta-teste-view',
+            defaults={
+                'name': 'Camiseta Teste View',
+                'category': self.category,
+                'price': 100.00,
+                'is_active': True
+            }
         )
-        self.variant = ProductVariant.objects.create(
+        self.variant, _ = ProductVariant.objects.get_or_create(
             product=self.product,
             color='preto',
             size='M',
-            stock=10
+            defaults={'stock': 10, 'is_available': True}
         )
 
     def test_apply_coupon_empty_cart_returns_400(self):

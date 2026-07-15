@@ -11,7 +11,8 @@ from apps.products.models import Category, Product, ProductVariant
 def make_category(**kwargs):
     defaults = {'name': 'Camisetas', 'slug': 'camisetas'}
     defaults.update(kwargs)
-    return Category.objects.create(**defaults)
+    cat, _ = Category.objects.get_or_create(slug=defaults['slug'], defaults=defaults)
+    return cat
 
 
 def make_product(category, **kwargs):
@@ -22,7 +23,9 @@ def make_product(category, **kwargs):
         'is_active': True,
     }
     defaults.update(kwargs)
-    return Product.objects.create(category=category, **defaults)
+    defaults['category'] = category
+    prod, _ = Product.objects.get_or_create(slug=defaults['slug'], defaults=defaults)
+    return prod
 
 
 def make_variant(product, color='preto', size='M', stock=10):
