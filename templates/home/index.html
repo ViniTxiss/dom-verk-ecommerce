@@ -54,9 +54,9 @@
         <a href="{% url 'products:list' %}?categoria={{ category.slug }}" class="cat-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
           <div class="cat-card__img">
             {% if category.image %}
-            <img src="{{ category.image.url }}" alt="{{ category.name }}" onerror="this.src='https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400'">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400'">
             {% else %}
-            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ category.name }}">
+            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ category.name }}" loading="lazy">
             {% endif %}
           </div>
           <div class="cat-card__label">
@@ -70,7 +70,7 @@
         {% for cat_name in placeholder_categories %}
         <a href="{% url 'products:list' %}" class="cat-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
           <div class="cat-card__img">
-            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ cat_name }}">
+            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ cat_name }}" loading="lazy">
           </div>
           <div class="cat-card__label">
             <span>{{ cat_name }}</span>
@@ -100,7 +100,7 @@
         {% for i in "12345678"|make_list %}
         <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
           <div class="product-card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80&sig={{ forloop.counter }}" alt="Camiseta DOM VERK" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=500'">
+            <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80&sig={{ forloop.counter }}" alt="Camiseta DOM VERK" class="product-card__img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=500'">
             <div class="product-card__overlay">
               <button class="btn btn--accent btn--sm">Escolher Tamanho</button>
             </div>
@@ -123,14 +123,14 @@
 <!-- ═══════════════════════════════════════════ SPLIT BANNER ═══ -->
 <section class="split-banner" data-aos="fade-up">
   <div class="split-banner__half split-banner__half--left">
-    <img src="https://images.unsplash.com/photo-1529720317453-c8da503f2051?w=800&q=80" alt="DOM VERK Masculino" onerror="this.src='https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=800'">
+    <img src="https://images.unsplash.com/photo-1529720317453-c8da503f2051?w=800&q=80" alt="DOM VERK Masculino" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=800'">
     <div class="split-banner__content">
       <h2>Para ele</h2>
       <a href="{% url 'products:list' %}" class="btn btn--white">Explorar →</a>
     </div>
   </div>
   <div class="split-banner__half split-banner__half--right">
-    <img src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=800&q=80" alt="DOM VERK Feminino" onerror="this.src='https://images.unsplash.com/photo-1594938298603-c8148c4b4c4a?w=800'">
+    <img src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=800&q=80" alt="DOM VERK Feminino" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1594938298603-c8148c4b4c4a?w=800'">
     <div class="split-banner__content">
       <h2>Para ela</h2>
       <a href="{% url 'products:list' %}" class="btn btn--white">Explorar →</a>
@@ -163,7 +163,7 @@
         {% for i in "1234"|make_list %}
         <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}50">
           <div class="product-card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80&sig=f{{ forloop.counter }}" alt="Oferta Relâmpago" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
+            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80&sig=f{{ forloop.counter }}" alt="Oferta Relâmpago" class="product-card__img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
             <div class="product-card__overlay">
               <button class="btn btn--accent btn--sm">Aproveitar</button>
             </div>

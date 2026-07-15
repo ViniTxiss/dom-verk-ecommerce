@@ -44,6 +44,7 @@ class Order(models.Model):
     discount = models.DecimalField('Desconto', max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField('Total', max_digits=10, decimal_places=2, default=0)
 
+    coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     notes = models.TextField('Observações', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -59,6 +60,73 @@ class Order(models.Model):
     @property
     def order_number(self):
         return f"DV{self.id:06d}"
+
+
+class Coupon(models.Model):
+    DISCOUNT_TYPES = [
+        ('percentage', 'Porcentagem (%)'),
+        ('fixed', 'Valor Fixo (R$)'),
+    ]
+
+    code = models.CharField('Código', max_length=50, unique=True)
+    discount_type = models.CharField('Tipo de Desconto', max_length=20, choices=DISCOUNT_TYPES, default='percentage')
+    discount_value = models.DecimalField('Valor do Desconto', max_digits=10, decimal_places=2)
+    min_purchase_value = models.DecimalField('Valor Mínimo de Compra', max_digits=10, decimal_places=2, default=0)
+    valid_from = models.DateTimeField('Válido a partir de', null=True, blank=True)
+    valid_until = models.DateTimeField('Válido até', null=True, blank=True)
+    active = models.BooleanField('Ativo', default=True)
+    max_uses = models.PositiveIntegerField('Limite de Usos', null=True, blank=True)
+    used_count = models.PositiveIntegerField('Usos Efetuados', default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Cupom de Desconto'
+        verbose_name_plural = 'Cupons de Desconto'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        if self.discount_type == 'percentage':
+            return f"{self.code.upper()} ({int(self.discount_value)}% OFF)"
+        return f"{self.code.upper()} (R$ {self.discount_value} OFF)"
+
+    def save(self, *args, **kwargs):
+        if self.code:
+            self.code = self.code.upper().strip()
+        super().save(*args, **kwargs)
+
+    def is_valid(self, subtotal=0):
+        from decimal import Decimal
+        subtotal = Decimal(str(subtotal))
+        if not self.active:
+            return False, "Cupom inativo."
+
+        from django.utils import timezone
+        now = timezone.now()
+        if self.valid_from and now < self.valid_from:
+            return False, "Cupom ainda não está ativo."
+        if self.valid_until and now > self.valid_until:
+            return False, "Cupom expirado."
+
+        if self.max_uses is not None and self.used_count >= self.max_uses:
+            return False, "Limite de usos deste cupom atingido."
+
+        if subtotal < self.min_purchase_value:
+            return False, f"Compra mínima de R$ {self.min_purchase_value:.2f} exigida."
+
+        return True, "Cupom válido."
+
+    def calculate_discount(self, subtotal):
+        from decimal import Decimal
+        subtotal = Decimal(str(subtotal))
+        if not subtotal or subtotal <= 0:
+            return Decimal('0.00')
+
+        if self.discount_type == 'percentage':
+            discount = (subtotal * self.discount_value) / Decimal('100')
+        else:
+            discount = self.discount_value
+
+        return min(discount, subtotal)
 
 
 class OrderItem(models.Model):
@@ -80,3 +148,4 @@ class OrderItem(models.Model):
     @property
     def total_price(self):
         return self.price * self.quantity
+

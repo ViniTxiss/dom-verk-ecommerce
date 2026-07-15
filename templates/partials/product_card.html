@@ -3,12 +3,12 @@
   <a href="{% url 'products:detail' product.slug %}" class="product-card__link">
     <div class="product-card__img-wrap">
       {% if product.image %}
-      <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card__img" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card__img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'">
       {% if product.image_hover %}
-      <img src="{{ product.image_hover.url }}" alt="{{ product.name }}" class="product-card__img product-card__img--hover">
+      <img src="{{ product.image_hover.url }}" alt="{{ product.name }}" class="product-card__img product-card__img--hover" loading="lazy">
       {% endif %}
       {% else %}
-      <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80" alt="{{ product.name }}" class="product-card__img">
+      <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80" alt="{{ product.name }}" class="product-card__img" loading="lazy">
       {% endif %}
 
       <div class="product-card__overlay">

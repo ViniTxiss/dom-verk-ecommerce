@@ -1,10 +1,12 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from encrypted_model_fields.fields import EncryptedCharField
 
 
 class CustomUser(AbstractUser):
     phone = models.CharField('Telefone', max_length=20, blank=True)
-    cpf = models.CharField('CPF', max_length=14, blank=True)
+    # CPF criptografado em repouso — conformidade LGPD (M3)
+    cpf = EncryptedCharField('CPF', max_length=14, blank=True)
     birth_date = models.DateField('Data de Nascimento', null=True, blank=True)
 
     # Endereço padrão

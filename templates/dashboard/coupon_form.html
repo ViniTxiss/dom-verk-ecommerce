@@ -1,0 +1,128 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}{{ action }} Cupom — DOM VERK{% endblock %}
+{% block breadcrumb %}Cupons › {{ action }}{% endblock %}
+{% block nav_coupons %}active{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{% url 'dashboard:coupons' %}" class="btn btn--ghost btn--sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">{{ action }} Cupom de Desconto</h1>
+    <p class="page-header__sub">
+      {% if coupon %}Editando cupom: <strong style="color:var(--accent);">{{ coupon.code }}</strong>{% else %}Configure as regras e validade do novo cupom.{% endif %}
+    </p>
+  </div>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div style="display:grid; grid-template-columns: 1fr 320px; gap:20px; align-items:start;">
+
+    <!-- COLUNA ESQUERDA -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <!-- REGRAS DO CUPOM -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Regras do Desconto</span></div>
+        <div class="card__body">
+          <div class="form-grid">
+
+            <div class="form-group form-group--full">
+              <label for="{{ form.code.id_for_label }}">{{ form.code.label }} *</label>
+              {{ form.code }}
+              {% if form.code.help_text %}<small style="color:var(--muted); font-size:11px;">{{ form.code.help_text }}</small>{% endif %}
+              {% if form.code.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.code.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.discount_type.id_for_label }}">{{ form.discount_type.label }} *</label>
+              {{ form.discount_type }}
+              {% if form.discount_type.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.discount_type.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.discount_value.id_for_label }}">{{ form.discount_value.label }} *</label>
+              {{ form.discount_value }}
+              {% if form.discount_value.help_text %}<small style="color:var(--muted); font-size:11px;">{{ form.discount_value.help_text }}</small>{% endif %}
+              {% if form.discount_value.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.discount_value.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="{{ form.min_purchase_value.id_for_label }}">{{ form.min_purchase_value.label }}</label>
+              {{ form.min_purchase_value }}
+              <small style="color:var(--muted); font-size:11px;">Valor mínimo de compra no carrinho para que o cupom seja válido.</small>
+              {% if form.min_purchase_value.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.min_purchase_value.errors.0 }}</p>{% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- VALIDADE E LIMITES -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Validade e Limite de Usos</span></div>
+        <div class="card__body">
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="{{ form.valid_from.id_for_label }}">{{ form.valid_from.label }}</label>
+              {{ form.valid_from }}
+              {% if form.valid_from.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.valid_from.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.valid_until.id_for_label }}">{{ form.valid_until.label }}</label>
+              {{ form.valid_until }}
+              {% if form.valid_until.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.valid_until.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="{{ form.max_uses.id_for_label }}">{{ form.max_uses.label }}</label>
+              {{ form.max_uses }}
+              {% if form.max_uses.help_text %}<small style="color:var(--muted); font-size:11px;">{{ form.max_uses.help_text }}</small>{% endif %}
+              {% if form.max_uses.errors %}<p class="form-error" style="color:var(--danger); font-size:12px;">{{ form.max_uses.errors.0 }}</p>{% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <!-- STATUS DO CUPOM -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Status</span></div>
+        <div class="card__body">
+          <div class="checkbox-row">
+            {{ form.active }}
+            <label for="{{ form.active.id_for_label }}">Cupom Ativo na Loja</label>
+          </div>
+          {% if coupon %}
+          <div style="margin-top:12px; font-size:12px; color:var(--muted); border-top:1px solid var(--border); padding-top:12px;">
+            <div>Usos efetuados: <strong>{{ coupon.used_count }}</strong></div>
+            <div>Criado em: {{ coupon.created_at|date:"d/m/Y H:i" }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- BOTÃO SALVAR -->
+      <button type="submit" class="btn btn--primary" style="width:100%; padding:12px;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        {% if coupon %}Salvar Alterações{% else %}Criar Cupom{% endif %}
+      </button>
+
+    </div>
+  </div>
+</form>
+
+{% endblock %}

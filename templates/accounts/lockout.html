@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Acesso Suspenso — DOM VERK{% endblock %}
+
+{% block content %}
+<div class="auth-page" style="display:flex; align-items:center; justify-content:center; min-height:80vh; padding: 2rem 1rem;">
+  <div class="auth-card" style="max-width: 480px; text-align: center; background: var(--bg-card, #111118); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 2.5rem 2rem;">
+
+    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;">
+      <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </div>
+
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+      Bloqueio Temporário de Segurança
+    </h1>
+
+    <p style="font-size: 0.95rem; color: var(--text-muted, #94a3b8); line-height: 1.6; margin-bottom: 1.5rem;">
+      Detectamos <strong>5 tentativas consecutivas de login incorretas</strong>. Para proteger sua conta contra acessos não autorizados, o login foi temporariamente suspenso.
+    </p>
+
+    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 1rem; margin-bottom: 2rem; font-size: 0.85rem; color: #cbd5e1; text-align: left;">
+      <div style="margin-bottom: 6px;">⏱️ <strong>Tempo de espera:</strong> 1 hora</div>
+      <div>🔒 <strong>Motivo:</strong> Proteção de conta contra ataques de força bruta (Rate Limit)</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <a href="{% url 'products:home' %}" class="btn btn--accent" style="width: 100%; text-decoration: none;">
+        ← Voltar para a Loja
+      </a>
+      <a href="https://wa.me/5511999999999?text=Ol%C3%A1,%20minha%20conta%20DOM%20VERK%20foi%20bloqueada%20por%20tentativas%20de%20login." target="_blank" class="btn btn--outline" style="width: 100%; text-decoration: none;">
+        💬 Falar com o Suporte (WhatsApp)
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

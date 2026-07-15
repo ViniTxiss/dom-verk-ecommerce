@@ -131,7 +131,14 @@
       {% endif %}
       <li><a href="{% url 'accounts:profile' %}">Minha Conta</a></li>
       <li><a href="{% url 'orders:history' %}">Meus Pedidos</a></li>
-      <li><a href="{% url 'accounts:logout' %}">Sair</a></li>
+      <li>
+        <form method="post" action="{% url 'accounts:logout' %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:0;">
+            Sair
+          </button>
+        </form>
+      </li>
     {% else %}
     <li><a href="{% url 'accounts:login' %}">Entrar</a></li>
     <li><a href="{% url 'accounts:register' %}">Criar Conta</a></li>
