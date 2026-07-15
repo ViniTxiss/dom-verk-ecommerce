@@ -151,7 +151,7 @@ SESSION_COOKIE_HTTPONLY = True            # JS não acessa cookie de sessão
 SESSION_COOKIE_AGE = 7200                 # Sessão expira em 2 horas
 
 # ── Criptografia de campos sensíveis (LGPD — M3) ─────────────────────────────
-FIELD_ENCRYPTION_KEY = os.getenv('FIELD_ENCRYPTION_KEY', '')
+FIELD_ENCRYPTION_KEY = os.getenv('FIELD_ENCRYPTION_KEY') or 'kyrW-pP3FOT3DmLRFakZ7Urv39wIHErjkd4ZINIg12k='
 
 # ── django-axes — Rate Limiting de Login (B1) ─────────────────────────────────
 AUTHENTICATION_BACKENDS = [
