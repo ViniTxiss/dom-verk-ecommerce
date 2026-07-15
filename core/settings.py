@@ -13,18 +13,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-# Railway — aceitar qualquer subdomínio .railway.app automaticamente
-RAILWAY_STATIC_URL = os.getenv('RAILWAY_STATIC_URL')
-if RAILWAY_STATIC_URL:
-    ALLOWED_HOSTS += [RAILWAY_STATIC_URL, f'.{RAILWAY_STATIC_URL}']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.railway.app,.up.railway.app').split(',')
+RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN')
+if RAILWAY_PUBLIC_DOMAIN and RAILWAY_PUBLIC_DOMAIN not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
 
 CSRF_TRUSTED_ORIGINS = [
-    f'https://{host}' for host in ALLOWED_HOSTS
-    if host not in ('localhost', '127.0.0.1', '')
+    'https://*.railway.app',
+    'https://*.up.railway.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
-CSRF_TRUSTED_ORIGINS += ['http://localhost:8000', 'http://127.0.0.1:8000']
+for host in ALLOWED_HOSTS:
+    host_clean = host.strip()
+    if host_clean and host_clean not in ('localhost', '127.0.0.1', '*'):
+        origin = f'https://{host_clean}' if not host_clean.startswith('http') else host_clean
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+
+# Informa ao Django que o Railway lida com SSL no proxy reverso
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 INSTALLED_APPS = [
@@ -133,7 +141,7 @@ CART_SESSION_ID = 'cart'
 
 # ── Segurança HTTP ──────────────────────────────────────────────────────────
 # Cabeçalhos ativos em TODOS os ambientes
-X_FRAME_OPTIONS = 'DENY'                  # Anti-clickjacking
+X_FRAME_OPTIONS = 'SAMEORIGIN'            # Permite framing na mesma origem
 SECURE_CONTENT_TYPE_NOSNIFF = True        # Anti-MIME sniffing
 SECURE_BROWSER_XSS_FILTER = True          # XSS filter (legado, mantido para suporte)
 
