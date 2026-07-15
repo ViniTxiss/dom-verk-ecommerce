@@ -88,13 +88,20 @@ SIZES = ['P', 'M', 'G', 'GG']
 class Command(BaseCommand):
     help = 'Popula o banco com dados iniciais da DOM VERK (categorias, produtos, variantes e avaliações).'
 
-    def handle(self, *args, **options):
-        self.stdout.write(self.style.MIGRATE_HEADING('\n[DOM VERK] Iniciando seed de substituição...\n'))
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--reset',
+            action='store_true',
+            help='Exclui produtos e categorias existentes antes de repopular.',
+        )
 
-        # Limpar registros existentes para substituição completa
-        Product.objects.all().delete()
-        Category.objects.all().delete()
-        self.stdout.write(self.style.WARNING('  [!] Dados antigos excluídos com sucesso.'))
+    def handle(self, *args, **options):
+        self.stdout.write(self.style.MIGRATE_HEADING('\n[DOM VERK] Iniciando seed...\n'))
+
+        if options.get('reset'):
+            Product.objects.all().delete()
+            Category.objects.all().delete()
+            self.stdout.write(self.style.WARNING('  [!] Dados antigos excluídos com sucesso.'))
 
         # Categorias
         cat_map = {}

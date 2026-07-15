@@ -27,8 +27,11 @@ ENV/
 *.log
 local_settings.py
 db.sqlite3
-db.sqlite3-journal
-media/
+# Media — preserva imagens e mídias de produto do catálogo
+media/*
+!media/products/
+!media/products/*.png
+!media/products/*.mp4
 
 # Static files coletados
 staticfiles/
