@@ -54,9 +54,21 @@
         <a href="{% url 'products:list' %}?categoria={{ category.slug }}" class="cat-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
           <div class="cat-card__img">
             {% if category.image %}
-            <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400'">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy">
+            {% elif category.slug == 'camisetas' %}
+            <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80" alt="{{ category.name }}" loading="lazy">
+            {% elif category.slug == 'polo' %}
+            <img src="https://images.unsplash.com/photo-1625910513413-4ec291244243?w=600&q=80" alt="{{ category.name }}" loading="lazy">
+            {% elif category.slug == 'manga-longa' %}
+            <img src="https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?w=600&q=80" alt="{{ category.name }}" loading="lazy">
+            {% elif category.slug == 'hoodies' %}
+            <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80" alt="{{ category.name }}" loading="lazy">
+            {% elif category.slug == 'calcas' %}
+            <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&q=80" alt="{{ category.name }}" loading="lazy">
+            {% elif category.slug == 'acessorios' %}
+            <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&q=80" alt="{{ category.name }}" loading="lazy">
             {% else %}
-            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80" alt="{{ category.name }}" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80" alt="{{ category.name }}" loading="lazy">
             {% endif %}
           </div>
           <div class="cat-card__label">
