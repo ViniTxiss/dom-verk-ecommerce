@@ -70,3 +70,34 @@ class Cart:
 
     def __len__(self):
         return self.get_total_items()
+
+    @property
+    def coupon_code(self):
+        return self.session.get('coupon_code')
+
+    def get_coupon(self):
+        code = self.coupon_code
+        if code:
+            try:
+                from apps.orders.models import Coupon
+                coupon = Coupon.objects.get(code=code)
+                is_valid, _ = coupon.is_valid(subtotal=self.get_total_price())
+                if is_valid:
+                    return coupon
+                else:
+                    if 'coupon_code' in self.session:
+                        del self.session['coupon_code']
+                        self.save()
+            except Exception:
+                pass
+        return None
+
+    def get_discount(self):
+        coupon = self.get_coupon()
+        if coupon:
+            return coupon.calculate_discount(self.get_total_price())
+        return Decimal('0.00')
+
+    def get_total_after_discount(self):
+        return self.get_total_price() - self.get_discount()
+

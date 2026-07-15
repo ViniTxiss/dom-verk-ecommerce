@@ -135,4 +135,21 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'  [=] Produto já existe: {product.name}')
 
-        self.stdout.write(self.style.SUCCESS('\n[DOM VERK] Seed concluído! Acesse /loja/ para conferir.\n'))
+        # Cupons de Desconto
+        from apps.orders.models import Coupon
+        from decimal import Decimal
+        COUPONS = [
+            {'code': 'DOM10', 'discount_type': 'percentage', 'discount_value': Decimal('10.00'), 'min_purchase_value': Decimal('0.00')},
+            {'code': 'VERK20', 'discount_type': 'fixed', 'discount_value': Decimal('20.00'), 'min_purchase_value': Decimal('100.00')},
+            {'code': 'BENVINDO15', 'discount_type': 'percentage', 'discount_value': Decimal('15.00'), 'min_purchase_value': Decimal('50.00')},
+        ]
+        self.stdout.write('')
+        for c_data in COUPONS:
+            coupon, created = Coupon.objects.get_or_create(
+                code=c_data['code'],
+                defaults=c_data
+            )
+            c_status = 'criado' if created else 'ja existe'
+            self.stdout.write(self.style.SUCCESS(f'  [CUPOM] Cupom "{coupon.code}" -- {c_status}'))
+
+        self.stdout.write(self.style.SUCCESS('\n[DOM VERK] Seed concluido! Acesse /loja/ para conferir.\n'))

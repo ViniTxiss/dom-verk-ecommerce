@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -30,6 +31,9 @@ def checkout(request):
             'address_state': u.address_state,
         }
 
+    coupon = cart.get_coupon()
+    coupon_discount = cart.get_discount()
+
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
@@ -37,15 +41,21 @@ def checkout(request):
             order.user = request.user if request.user.is_authenticated else None
             order.subtotal = cart.get_total_price()
 
-            # Frete grátis acima de R$ 199
-            order.shipping = 0 if order.subtotal >= 199 else 19.90
+            # Frete grátis acima de R$ 199 (usando Decimal para evitar TypeError com float)
+            order.shipping = Decimal('0.00') if order.subtotal >= Decimal('199.00') else Decimal('19.90')
 
-            # Desconto PIX (10%)
-            if order.payment_method == 'pix':
-                order.discount = order.subtotal * 10 / 100
-            else:
-                order.discount = 0
+            # Desconto do cupom
+            if coupon:
+                order.coupon = coupon
+                coupon.used_count += 1
+                coupon.save()
 
+            subtotal_after_coupon = order.subtotal - coupon_discount
+
+            # Desconto PIX (10% sobre subtotal após cupom, em Decimal)
+            pix_discount = (subtotal_after_coupon * Decimal('0.10')) if order.payment_method == 'pix' else Decimal('0.00')
+
+            order.discount = coupon_discount + pix_discount
             order.total = order.subtotal + order.shipping - order.discount
             order.save()
 
@@ -62,7 +72,16 @@ def checkout(request):
                         quantity=item['quantity'],
                     )
 
+            if 'coupon_code' in request.session:
+                del request.session['coupon_code']
             cart.clear()
+
+            # Registrar pedido na sessão para verificação de acesso (segurança C1+C2)
+            confirmed = request.session.get('confirmed_orders', [])
+            confirmed.append(order.id)
+            request.session['confirmed_orders'] = confirmed
+            request.session.modified = True
+
             messages.success(request, f'Pedido #{order.order_number} realizado com sucesso!')
             return redirect('orders:confirmation', order_id=order.id)
     else:
@@ -72,18 +91,40 @@ def checkout(request):
         'form': form,
         'cart': cart,
         'subtotal': cart.get_total_price(),
+        'coupon': coupon,
+        'coupon_discount': coupon_discount,
     }
     return render(request, 'orders/checkout.html', context)
 
 
+def _can_access_order(request, order):
+    """Verifica se o usuário/sessão atual tem permissão para acessar este pedido."""
+    # Usuário logado dono do pedido
+    if request.user.is_authenticated and order.user == request.user:
+        return True
+    # Staff pode acessar qualquer pedido
+    if request.user.is_authenticated and request.user.is_staff:
+        return True
+    # Pedido registrado na sessão (fluxo anônimo ou logo após o checkout)
+    if order.id in request.session.get('confirmed_orders', []):
+        return True
+    return False
+
+
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+    if not _can_access_order(request, order):
+        messages.error(request, 'Você não tem permissão para acessar este pedido.')
+        return redirect('products:home')
     return render(request, 'orders/confirmation.html', {'order': order})
 
 
 def simulate_payment(request, order_id):
     if request.method == 'POST':
         order = get_object_or_404(Order, id=order_id)
+        if not _can_access_order(request, order):
+            messages.error(request, 'Você não tem permissão para realizar esta ação.')
+            return redirect('products:home')
         if order.status == 'pending':
             order.status = 'paid'
             order.save()

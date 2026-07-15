@@ -53,3 +53,6 @@ htmlcov/
 .coverage.*
 .cache
 .pytest_cache/
+
+# Agentes de IA — nunca vai ao GitHub
+agents/

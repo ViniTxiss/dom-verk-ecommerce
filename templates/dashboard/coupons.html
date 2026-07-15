@@ -1,0 +1,142 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Cupons — DOM VERK{% endblock %}
+{% block breadcrumb %}Cupons{% endblock %}
+{% block nav_coupons %}active{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{% url 'dashboard:coupon_create' %}" class="btn btn--primary">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Novo Cupom
+  </a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">Cupons de Desconto</h1>
+    <p class="page-header__sub">Gerencie códigos promocionais e regras de desconto da loja</p>
+  </div>
+</div>
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card__label">Total de Cupons</div>
+    <div class="stat-card__value">{{ total_coupons }}</div>
+    <div class="stat-card__icon">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__label">Cupons Ativos</div>
+    <div class="stat-card__value" style="color: var(--success);">{{ active_coupons }}</div>
+    <div class="stat-card__icon">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__label">Total de Usos</div>
+    <div class="stat-card__value" style="color: var(--accent);">{{ total_uses }}</div>
+    <div class="stat-card__icon">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- FILTRO BUSCA -->
+<div class="card" style="margin-bottom: 20px; padding: 16px 20px;">
+  <form method="get" style="display:flex; gap:12px; align-items:center;">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por código do cupom..." class="form-input" style="max-width: 320px;">
+    <button type="submit" class="btn btn--ghost">Filtrar</button>
+    {% if q %}
+    <a href="{% url 'dashboard:coupons' %}" class="btn btn--ghost" style="color: var(--muted);">Limpar</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- TABELA DE CUPONS -->
+<div class="card">
+  <div class="table-wrap">
+    {% if coupons %}
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Desconto</th>
+          <th>Compra Mínima</th>
+          <th>Usos / Limite</th>
+          <th>Validade</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for coupon in coupons %}
+        <tr>
+          <td>
+            <strong style="color: var(--accent); font-size: 14px; letter-spacing: 0.5px;">{{ coupon.code }}</strong>
+          </td>
+          <td>
+            {% if coupon.discount_type == 'percentage' %}
+            <span class="badge badge--processing">{{ coupon.discount_value|floatformat:0 }}% OFF</span>
+            {% else %}
+            <span class="badge badge--paid">R$ {{ coupon.discount_value }} OFF</span>
+            {% endif %}
+          </td>
+          <td style="color: var(--muted);">
+            {% if coupon.min_purchase_value > 0 %}
+            R$ {{ coupon.min_purchase_value }}
+            {% else %}
+            Sem mínimo
+            {% endif %}
+          </td>
+          <td>
+            <strong>{{ coupon.used_count }}</strong>
+            <span style="color: var(--muted);"> / {% if coupon.max_uses %}{{ coupon.max_uses }}{% else %}∞{% endif %}</span>
+          </td>
+          <td style="font-size: 12px; color: var(--muted);">
+            {% if coupon.valid_from or coupon.valid_until %}
+              {% if coupon.valid_from %}{{ coupon.valid_from|date:"d/m/Y H:i" }}{% else %}Início{% endif %}
+              às
+              {% if coupon.valid_until %}{{ coupon.valid_until|date:"d/m/Y H:i" }}{% else %}Indeterminado{% endif %}
+            {% else %}
+              Sempre válido
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge badge--{% if coupon.active %}active{% else %}inactive{% endif %}">
+              {% if coupon.active %}Ativo{% else %}Inativo{% endif %}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <a href="{% url 'dashboard:coupon_edit' coupon.id %}" class="btn btn--ghost btn--sm">Editar</a>
+              <form method="post" action="{% url 'dashboard:coupon_toggle' coupon.id %}" style="margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--{% if coupon.active %}danger{% else %}ghost{% endif %} btn--sm">
+                  {% if coupon.active %}Desativar{% else %}Ativar{% endif %}
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      <h3>Nenhum cupom encontrado</h3>
+      <p>Clique em "Novo Cupom" para criar regras promocionais.</p>
+      <br>
+      <a href="{% url 'dashboard:coupon_create' %}" class="btn btn--primary">+ Novo Cupom</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

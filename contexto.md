@@ -49,25 +49,22 @@ Para evitar reescrever ou quebrar padrões estabelecidos no código, siga estas 
 - **Tradução de Termos:** Alteração de "Flash Deals" para "Oferta Relâmpago" na navegação desktop/mobile, cabeçalho, rodapé, barra de anúncio e painel de administração de produtos.
 - **Integração de Produtos FIOTECH:** Substituição total do catálogo antigo por 5 novos produtos da FIOTECH (Camiseta Dryfit, Conjunto Top/Legging, Short Fitness, Top Nadador e Camiseta Oversized). Foram geradas imagens premium via IA para cada produto, criadas novas categorias (Fitness, Feminino, Conjuntos), adicionadas cores (Rosa, Café, Capuccino) com migração de banco e correção de colisão de SKUs.
 - **Vídeo de Background no Hero:** Substituição da imagem de fundo estática no hero da página inicial por um loop de vídeo em tela cheia (`Black_t-shirt_with_print_202607022204.mp4`), estilizado para preenchimento cover responsivo.
+- **Otimização de Imagens (Lazy-Loading & SEO):** Adicionado atributo `loading="lazy"` nas imagens do catálogo, home e resumo de checkout para acelerar o carregamento da página.
+- **Autocompletar CEP Dinâmico no Checkout (ViaCEP):** Integração com a API ViaCEP via JavaScript assíncrono para preenchimento automático de logradouro, bairro, cidade e estado.
+- **Sistema de Cupons de Desconto:** Modelo `Coupon`, rotas AJAX para aplicação e remoção de cupons na sessão, cálculo dinâmico de desconto no checkout, integração com admin e testes unitários.
 
 ---
 
 ## 🎯 Próximas Mudanças (Backlog Priorizado para a IA)
 
-Caso os créditos da IA anterior tenham acabado, a IA atual deve começar pela **Prioridade 1** ou pela instrução explícita do usuário:
+Caso os créditos da IA anterior tenham acabado, a IA atual deve verificar novas prioridades ou aguardar orientações do usuário:
 
-### 🟩 Prioridade 1: Otimização de Imagens (Lazy-Loading & SEO)
-*   **O que fazer:** Adicionar o atributo `loading="lazy"` nas tags de imagens do catálogo (Home e Loja) e otimizar assets.
-*   **Onde alterar:** `templates/home/index.html` e `templates/products/list.html`.
-*   **Foco técnico:** Evitar que imagens pesadas travem o carregamento inicial da página.
+### ✅ Concluído Recente
+*   **Painel Administrativo de Cupons (`/dashboard/cupons/`)**: Interface customizada no Dashboard com métricas, busca por código, formulários de criação/edição e ativação/desativação instantânea com proteção staff.
+*   **Feedback de Bloqueio por Tentativas (Rate Limit Login)**: Criado o template `templates/accounts/lockout.html` com design dark mode e orientações claras (tempo de espera de 1h e botão para WhatsApp do suporte) exibido quando exceder 5 tentativas falhas de login.
 
-### 🟨 Prioridade 2: Autocompletar CEP Dinâmico no Checkout (ViaCEP)
-*   **O que fazer:** Integrar o formulário de checkout com a API ViaCEP via JavaScript assíncrono (AJAX). Ao preencher o CEP com 8 dígitos, os campos de Rua, Bairro, Cidade e Estado devem ser preenchidos automaticamente.
-*   **Onde alterar:** `templates/orders/checkout.html` (ou script correspondente) e lógica de form.
-*   **Foco técnico:** UX (Experiência do Usuário) fluida e sem recarregamento de página.
-
-### 🟥 Prioridade 3: Sistema de Cupons de Desconto
-*   **O que fazer:** Criar modelo `Coupon` (código, porcentagem/valor fixo, validade e ativo). Integrar aplicação de cupons no carrinho e na sessão de checkout com atualização dinâmica do total.
+### 🟩 Prioridade 1: Deploy das Correções e Novas Features para Produção (Railway)
+*   **O que fazer:** Realizar `git push` para enviar o painel de cupons, o tratamento de lockout, a correção do erro 500 do checkout e o hardening de segurança para o Railway.
 
 ---
 

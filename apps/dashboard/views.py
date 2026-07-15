@@ -5,8 +5,22 @@ from django.db.models import Sum, Count
 from django.utils import timezone
 from datetime import timedelta
 from apps.products.models import Product, Category
-from apps.orders.models import Order
+from apps.orders.models import Order, Coupon
+from .forms import CouponForm
 
+ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+
+
+def _validate_image(file):
+    """Valida tipo MIME e extensão do arquivo de imagem enviado."""
+    import os
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        return False, f'Extensão inválida: {ext}. Use JPG, PNG, WEBP ou GIF.'
+    if hasattr(file, 'content_type') and file.content_type not in ALLOWED_IMAGE_TYPES:
+        return False, f'Tipo de arquivo não permitido: {file.content_type}.'
+    return True, None
 
 @staff_member_required
 def dashboard_home(request):
@@ -80,8 +94,16 @@ def dashboard_product_create(request):
             if promo:
                 product.price_promo = promo
             if 'image' in request.FILES:
+                ok, err = _validate_image(request.FILES['image'])
+                if not ok:
+                    messages.error(request, f'Imagem principal inválida: {err}')
+                    return render(request, 'dashboard/product_form.html', {'categories': categories, 'action': 'Criar'})
                 product.image = request.FILES['image']
             if 'image_hover' in request.FILES:
+                ok, err = _validate_image(request.FILES['image_hover'])
+                if not ok:
+                    messages.error(request, f'Imagem hover inválida: {err}')
+                    return render(request, 'dashboard/product_form.html', {'categories': categories, 'action': 'Criar'})
                 product.image_hover = request.FILES['image_hover']
             product.save()
             messages.success(request, f'Produto "{product.name}" criado com sucesso!')
@@ -108,8 +130,16 @@ def dashboard_product_edit(request, product_id):
             promo = request.POST.get('price_promo', '').strip()
             product.price_promo = promo if promo else None
             if 'image' in request.FILES:
+                ok, err = _validate_image(request.FILES['image'])
+                if not ok:
+                    messages.error(request, f'Imagem principal inválida: {err}')
+                    return render(request, 'dashboard/product_form.html', {'product': product, 'categories': categories, 'action': 'Editar'})
                 product.image = request.FILES['image']
             if 'image_hover' in request.FILES:
+                ok, err = _validate_image(request.FILES['image_hover'])
+                if not ok:
+                    messages.error(request, f'Imagem hover inválida: {err}')
+                    return render(request, 'dashboard/product_form.html', {'product': product, 'categories': categories, 'action': 'Editar'})
                 product.image_hover = request.FILES['image_hover']
             product.save()
             messages.success(request, f'Produto "{product.name}" atualizado!')
@@ -131,3 +161,64 @@ def dashboard_product_delete(request, product_id):
         product.delete()
         messages.success(request, f'Produto "{name}" excluído.')
     return redirect('dashboard:products')
+
+
+# ── GERENCIAMENTO DE CUPONS ────────────────────────────────────────────────
+@staff_member_required
+def dashboard_coupons(request):
+    coupons = Coupon.objects.all().order_by('-created_at')
+    q = request.GET.get('q', '').strip()
+    if q:
+        coupons = coupons.filter(code__icontains=q)
+
+    total_coupons = Coupon.objects.count()
+    active_coupons = Coupon.objects.filter(active=True).count()
+    total_uses = Coupon.objects.aggregate(total=Sum('used_count'))['total'] or 0
+
+    context = {
+        'coupons': coupons,
+        'q': q,
+        'total_coupons': total_coupons,
+        'active_coupons': active_coupons,
+        'total_uses': total_uses,
+    }
+    return render(request, 'dashboard/coupons.html', context)
+
+
+@staff_member_required
+def dashboard_coupon_create(request):
+    if request.method == 'POST':
+        form = CouponForm(request.POST)
+        if form.is_valid():
+            coupon = form.save()
+            messages.success(request, f'Cupom "{coupon.code}" criado com sucesso!')
+            return redirect('dashboard:coupons')
+    else:
+        form = CouponForm()
+    return render(request, 'dashboard/coupon_form.html', {'form': form, 'action': 'Criar'})
+
+
+@staff_member_required
+def dashboard_coupon_edit(request, coupon_id):
+    coupon = get_object_or_404(Coupon, id=coupon_id)
+    if request.method == 'POST':
+        form = CouponForm(request.POST, instance=coupon)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Cupom "{coupon.code}" atualizado com sucesso!')
+            return redirect('dashboard:coupons')
+    else:
+        form = CouponForm(instance=coupon)
+    return render(request, 'dashboard/coupon_form.html', {'form': form, 'coupon': coupon, 'action': 'Editar'})
+
+
+@staff_member_required
+def dashboard_coupon_toggle(request, coupon_id):
+    if request.method == 'POST':
+        coupon = get_object_or_404(Coupon, id=coupon_id)
+        coupon.active = not coupon.active
+        coupon.save()
+        status_str = 'ativado' if coupon.active else 'desativado'
+        messages.success(request, f'Cupom "{coupon.code}" {status_str} com sucesso.')
+    return redirect('dashboard:coupons')
+

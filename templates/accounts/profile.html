@@ -17,7 +17,10 @@
     <div style="display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
       <button type="submit" class="btn btn--accent">Salvar Alterações</button>
       <a href="{% url 'orders:history' %}" class="btn btn--outline">Ver Pedidos</a>
-      <a href="{% url 'accounts:logout' %}" class="btn btn--ghost">Sair</a>
+      <form method="post" action="{% url 'accounts:logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--ghost">Sair</button>
+      </form>
     </div>
   </form>
 </div>

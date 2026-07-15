@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third-party
     'django_extensions',
+    'encrypted_model_fields',
+    'axes',
     # Local apps
     'apps.products',
     'apps.cart',
@@ -51,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -127,3 +130,40 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cart session key
 CART_SESSION_ID = 'cart'
+
+# ── Segurança HTTP ──────────────────────────────────────────────────────────
+# Cabeçalhos ativos em TODOS os ambientes
+X_FRAME_OPTIONS = 'DENY'                  # Anti-clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True        # Anti-MIME sniffing
+SECURE_BROWSER_XSS_FILTER = True          # XSS filter (legado, mantido para suporte)
+
+# Configurações APENAS para produção (quando DEBUG=False)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True            # Redireciona HTTP → HTTPS
+    SECURE_HSTS_SECONDS = 31536000        # HSTS por 1 ano
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True          # Cookie de sessão apenas via HTTPS
+    CSRF_COOKIE_SECURE = True             # Cookie CSRF apenas via HTTPS
+
+# Cookies seguros em todos os ambientes
+SESSION_COOKIE_HTTPONLY = True            # JS não acessa cookie de sessão
+SESSION_COOKIE_AGE = 7200                 # Sessão expira em 2 horas
+
+# ── Criptografia de campos sensíveis (LGPD — M3) ─────────────────────────────
+FIELD_ENCRYPTION_KEY = os.getenv('FIELD_ENCRYPTION_KEY', '')
+
+# ── django-axes — Rate Limiting de Login (B1) ─────────────────────────────────
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5              # Bloqueia após 5 tentativas falhas
+AXES_COOLOFF_TIME = 1               # Período de bloqueio: 1 hora
+AXES_LOCKOUT_PARAMETERS = ['ip_address', 'username']  # Bloqueia por IP + usuário
+AXES_RESET_ON_SUCCESS = True        # Reseta contagem após login bem-sucedido
+AXES_ENABLE_ADMIN = True            # Exibe tentativas no Django Admin
+AXES_VERBOSE = False                # Não polui os logs em produção
+AXES_LOCKOUT_TEMPLATE = 'accounts/lockout.html'  # Template de feedback amigável
+

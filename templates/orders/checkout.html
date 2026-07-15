@@ -146,9 +146,9 @@
             <div class="checkout-item">
               <div class="checkout-item__img">
                 {% if item.product.image %}
-                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80'">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80'">
                 {% else %}
-                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80" alt="{{ item.product.name }}">
+                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80" alt="{{ item.product.name }}" loading="lazy">
                 {% endif %}
                 <span class="checkout-item__qty">{{ item.quantity }}</span>
               </div>
@@ -162,10 +162,31 @@
             {% endfor %}
           </div>
 
+          <!-- Cupom de Desconto -->
+          <div class="coupon-box" style="margin-block: 1rem 1.5rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.5rem; color:var(--text);">Cupom de Desconto</label>
+            <div style="display:{% if coupon %}none{% else %}flex{% endif %}; gap:0.5rem;" id="coupon-input-wrap">
+              <input type="text" id="coupon-code-input" placeholder="Ex: DOM10" value="{% if coupon %}{{ coupon.code }}{% endif %}" style="flex:1; padding:0.5rem 0.75rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg); color:var(--text); font-size:0.875rem; text-transform:uppercase;">
+              <button type="button" class="btn btn--accent btn--sm" id="btn-apply-coupon" onclick="applyCoupon()">Aplicar</button>
+            </div>
+            <div id="coupon-applied-wrap" style="display:{% if coupon %}flex{% else %}none{% endif %}; justify-content:space-between; align-items:center; background:rgba(34,197,94,0.1); border:1px dashed var(--success); padding:0.5rem 0.75rem; border-radius:var(--radius);">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span style="color:var(--success); font-weight:700;">🏷️ <span id="applied-coupon-code">{% if coupon %}{{ coupon.code }}{% endif %}</span></span>
+                <span style="font-size:0.75rem; color:var(--text-muted);" id="applied-coupon-text">Cupom Aplicado</span>
+              </div>
+              <button type="button" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="removeCoupon()">Remover</button>
+            </div>
+            <p id="coupon-feedback" style="font-size:0.78rem; margin-top:0.5rem; display:none;"></p>
+          </div>
+
           <div class="checkout-totals">
             <div class="checkout-total-row">
               <span>Subtotal</span>
               <span>R$ {{ subtotal|floatformat:2 }}</span>
+            </div>
+            <div class="checkout-total-row" id="coupon-discount-row" style="display:{% if coupon_discount > 0 %}flex{% else %}none{% endif %};">
+              <span>Cupom de Desconto</span>
+              <span class="checkout-discount" id="coupon-discount-val">- R$ {{ coupon_discount|floatformat:2 }}</span>
             </div>
             <div class="checkout-total-row" id="pix-discount-row">
               <span>Desconto PIX (10%)</span>
@@ -197,23 +218,100 @@
 <script>
 const subtotal = {{ subtotal|floatformat:2 }};
 const shipping = subtotal >= 199 ? 0 : 19.90;
+let couponDiscount = {{ coupon_discount|default:0|floatformat:2 }};
 
 function updateTotals(paymentMethod) {
-  const discount = paymentMethod === 'pix' ? subtotal * 0.10 : 0;
-  const total = subtotal - discount + shipping;
+  const subtotalAfterCoupon = Math.max(0, subtotal - couponDiscount);
+  const pixDiscount = paymentMethod === 'pix' ? subtotalAfterCoupon * 0.10 : 0;
+  const total = subtotalAfterCoupon - pixDiscount + shipping;
 
-  const discountRow = document.getElementById('pix-discount-row');
-  const discountVal = document.getElementById('pix-discount-val');
+  const pixRow = document.getElementById('pix-discount-row');
+  const pixVal = document.getElementById('pix-discount-val');
+  const couponRow = document.getElementById('coupon-discount-row');
+  const couponVal = document.getElementById('coupon-discount-val');
   const totalVal = document.getElementById('total-val');
 
-  if (discount > 0) {
-    discountRow.style.display = 'flex';
-    discountVal.textContent = `- R$ ${discount.toFixed(2).replace('.', ',')}`;
+  if (couponDiscount > 0) {
+    couponRow.style.display = 'flex';
+    couponVal.textContent = `- R$ ${couponDiscount.toFixed(2).replace('.', ',')}`;
   } else {
-    discountRow.style.display = 'none';
+    couponRow.style.display = 'none';
+  }
+
+  if (pixDiscount > 0) {
+    pixRow.style.display = 'flex';
+    pixVal.textContent = `- R$ ${pixDiscount.toFixed(2).replace('.', ',')}`;
+  } else {
+    pixRow.style.display = 'none';
   }
 
   totalVal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+async function applyCoupon() {
+  const input = document.getElementById('coupon-code-input');
+  const code = input.value.trim();
+  const feedback = document.getElementById('coupon-feedback');
+  const btn = document.getElementById('btn-apply-coupon');
+
+  if (!code) return;
+  btn.disabled = true;
+  feedback.style.display = 'none';
+
+  try {
+    const response = await fetch("{% url 'cart:apply_coupon' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ code })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      couponDiscount = data.discount_amount;
+      document.getElementById('applied-coupon-code').textContent = data.code;
+      document.getElementById('coupon-input-wrap').style.display = 'none';
+      document.getElementById('coupon-applied-wrap').style.display = 'flex';
+      feedback.style.color = 'var(--success)';
+      feedback.textContent = data.message;
+      feedback.style.display = 'block';
+      const activeMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'pix';
+      updateTotals(activeMethod);
+    } else {
+      feedback.style.color = '#ef4444';
+      feedback.textContent = data.error || 'Erro ao aplicar cupom.';
+      feedback.style.display = 'block';
+    }
+  } catch (e) {
+    feedback.style.color = '#ef4444';
+    feedback.textContent = 'Erro de conexão ao aplicar cupom.';
+    feedback.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function removeCoupon() {
+  try {
+    await fetch("{% url 'cart:remove_coupon' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      }
+    });
+    couponDiscount = 0;
+    document.getElementById('coupon-code-input').value = '';
+    document.getElementById('coupon-input-wrap').style.display = 'flex';
+    document.getElementById('coupon-applied-wrap').style.display = 'none';
+    document.getElementById('coupon-feedback').style.display = 'none';
+    const activeMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'pix';
+    updateTotals(activeMethod);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
@@ -234,5 +332,62 @@ document.getElementById('checkout-form')?.addEventListener('submit', function() 
   btn.textContent = 'Processando...';
   btn.disabled = true;
 });
+
+// Autocompletar CEP via ViaCEP API
+(function initViaCep() {
+  const zipInput = document.querySelector('[name="address_zip"]') || document.getElementById('cep');
+  if (!zipInput) return;
+
+  const streetInput = document.querySelector('[name="address_street"]');
+  const neighborhoodInput = document.querySelector('[name="address_neighborhood"]');
+  const cityInput = document.querySelector('[name="address_city"]');
+  const stateInput = document.querySelector('[name="address_state"]');
+  const numberInput = document.querySelector('[name="address_number"]');
+
+  let isFetching = false;
+
+  async function fetchAddressByCep(cepClean) {
+    if (isFetching) return;
+    isFetching = true;
+    zipInput.style.opacity = '0.7';
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepClean}/json/`);
+      if (!response.ok) throw new Error('Erro ao buscar CEP');
+      const data = await response.json();
+
+      if (data.erro) {
+        alert('CEP não encontrado. Por favor, verifique o número digitado.');
+        return;
+      }
+
+      if (streetInput && data.logradouro) streetInput.value = data.logradouro;
+      if (neighborhoodInput && data.bairro) neighborhoodInput.value = data.bairro;
+      if (cityInput && data.localidade) cityInput.value = data.localidade;
+      if (stateInput && data.uf) stateInput.value = data.uf;
+
+      if (numberInput) numberInput.focus();
+    } catch (err) {
+      console.error('Erro na consulta do ViaCEP:', err);
+    } finally {
+      isFetching = false;
+      zipInput.style.opacity = '1';
+    }
+  }
+
+  zipInput.addEventListener('input', function() {
+    const cepClean = this.value.replace(/\D/g, '');
+    if (cepClean.length === 8) {
+      fetchAddressByCep(cepClean);
+    }
+  });
+
+  zipInput.addEventListener('blur', function() {
+    const cepClean = this.value.replace(/\D/g, '');
+    if (cepClean.length === 8) {
+      fetchAddressByCep(cepClean);
+    }
+  });
+})();
 </script>
 {% endblock %}
