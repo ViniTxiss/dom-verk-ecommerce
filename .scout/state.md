@@ -146,5 +146,12 @@ Arquivos tocados:
   - apps/accounts/views.py (tratamento de exceção de lockout no login_view)
   - core/settings.py (AXES_LOCKOUT_TEMPLATE)
   - apps/accounts/tests.py (suíte de testes unitários de accounts)
-
+## 2026-07-16 — Scout — Validação de Testes Automatizados e Deploy Railway
+Status: concluído
+Motivo/resultado: Executada a suíte com 52/52 testes passando (100% OK). Adicionados novos vídeos de produto em `media/products/` e efetuado `git push origin master` para disparar o deploy automático na Railway.
+Arquivos tocados:
+  - media/products/BLACK-T-SHIRT-DOM.mp4
+  - media/products/BRANCO-T-SHIRT-DOM.mp4
+  - media/products/Black_t-shirt_with_print_202607022204c.mp4
+  - .scout/state.md
 
